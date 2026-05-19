@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Feedback Editorial</title>
 
   <link rel="stylesheet" href="./styles.css" />
@@ -16,10 +17,11 @@
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        <img src="./assets/logo.png" alt="Logo do projeto" class="brand-logo" />
+        <img src="./assets/logo.png" alt="Logo" class="brand-logo" />
+
         <div>
           <h1>Feedback Editorial</h1>
-          <p>Gerador premium de relatórios</p>
+          <p>Gerador profissional de relatórios</p>
         </div>
       </div>
 
@@ -31,7 +33,8 @@
       </nav>
 
       <section class="side-panel">
-        <h2>Categorias detectadas</h2>
+        <h2>Categorias</h2>
+
         <div id="categoryList" class="category-list">
           <p class="side-empty">Nenhuma categoria carregada.</p>
         </div>
@@ -39,6 +42,7 @@
 
       <section class="side-panel compact">
         <h2>Ações</h2>
+
         <button id="saveBtn" class="btn side full">Salvar no navegador</button>
         <button id="clearBtn" class="btn danger full">Limpar tudo</button>
       </section>
@@ -48,9 +52,9 @@
       <section id="tab-prompts" class="tab-panel active">
         <header class="workspace-header">
           <span>Biblioteca de Prompts</span>
-          <h2>Prompts salvos para organizar revisões editoriais</h2>
+          <h2>Organização automática do relatório</h2>
           <p>
-            Copie um dos prompts, cole na IA junto com a revisão bruta e depois traga o texto
+            Copie um prompt, cole na IA junto com a revisão editorial bruta e depois traga o texto
             padronizado para a aba Importar.
           </p>
         </header>
@@ -59,28 +63,31 @@
           <article class="app-card prompt-card">
             <h3>Documento completo</h3>
             <p>
-              Organiza o relatório preservando todas as informações, tabelas, exemplos,
-              categorias, sugestões de reescrita e veredito final.
+              Mantém o conteúdo integral da análise, separando campos, categorias,
+              tabelas, exemplos, reescritas e veredito final.
             </p>
+
             <button id="copyFullPromptBtn" class="btn primary">Copiar prompt completo</button>
           </article>
 
           <article class="app-card prompt-card">
             <h3>Versão resumida</h3>
             <p>
-              Gera uma versão menor do relatório, mantendo diagnóstico, pontos fortes,
-              fragilidades, prioridades, plano de melhoria e veredito.
+              Condensa a revisão em um relatório menor, preservando diagnóstico,
+              prioridades, pontos fortes, fragilidades e plano de melhoria.
             </p>
+
             <button id="copySummaryPromptBtn" class="btn primary">Copiar prompt resumido</button>
           </article>
         </div>
 
         <article class="app-card info-card">
-          <h3>Padrão reconhecido pela plataforma</h3>
+          <h3>Padrão reconhecido</h3>
+
           <p>
             A plataforma reconhece campos como <strong>[OBRA]</strong>,
-            <strong>[GENERO_LITERARIO]</strong>, <strong>[PUBLICO_ALVO]</strong> e blocos de
-            categoria com <strong>[CATEGORIA]</strong>, <strong>[TIPO_CATEGORIA]</strong>,
+            <strong>[GENERO_LITERARIO]</strong>, <strong>[PUBLICO_ALVO]</strong> e blocos com
+            <strong>[CATEGORIA]</strong>, <strong>[TIPO_CATEGORIA]</strong>,
             <strong>[RESUMO_CATEGORIA]</strong>, <strong>[CONTEUDO]</strong> e
             <strong>[FIM_CATEGORIA]</strong>.
           </p>
@@ -93,8 +100,7 @@
             <span>Entrada</span>
             <h2>Importar texto padronizado</h2>
             <p>
-              Cole aqui o texto organizado pela IA. Depois clique em processar para separar
-              campos, categorias e conteúdo automaticamente.
+              Cole o texto organizado pela IA. A plataforma separa os campos e monta o documento.
             </p>
           </div>
 
@@ -114,8 +120,7 @@
           <span>Editor</span>
           <h2>Editar campos e categorias</h2>
           <p>
-            Edite os dados principais do relatório ou selecione uma categoria na lateral para
-            alterar apenas aquela seção.
+            Ajuste os dados principais ou escolha uma categoria na lateral para editar somente aquela parte.
           </p>
         </header>
 
@@ -203,8 +208,7 @@
             <span>Documento Final</span>
             <h2>Prévia A4 e geração de PDF</h2>
             <p>
-              O PDF é gerado diretamente pela plataforma com layout A4, capa, páginas internas,
-              paginação automática e folha final de veredito.
+              O documento será gerado em páginas A4 com capa, ficha técnica, conteúdo paginado e encerramento.
             </p>
           </div>
 

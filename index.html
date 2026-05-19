@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback Editorial</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+
+  <script defer src="./script.js"></script>
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo-wrap">
+          <img src="./assets/logo.png" alt="Logo" class="brand-logo" />
+        </div>
+
+        <div>
+          <h1>Feedback Editorial</h1>
+          <p>Gerador de documentos editoriais</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Navegação principal">
+        <button class="nav-tab active" data-tab="prompts">Prompts</button>
+        <button class="nav-tab" data-tab="importar">Importar</button>
+        <button class="nav-tab" data-tab="editar">Editar</button>
+        <button class="nav-tab" data-tab="preview">Prévia</button>
+      </nav>
+
+      <div class="sidebar-section">
+        <h2>Categorias detectadas</h2>
+        <div id="categoryList" class="category-list">
+          <div class="empty-state small">
+            Nenhuma categoria carregada ainda.
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="saveBtn" class="btn secondary full">Salvar no navegador</button>
+        <button id="clearBtn" class="btn danger full">Limpar tudo</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section id="tab-prompts" class="tab-panel active">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">Biblioteca</span>
+            <h2>Prompts salvos</h2>
+            <p>
+              Copie um dos prompts, cole na IA junto com a avaliação editorial bruta,
+              depois traga o resultado padronizado para a aba Importar.
+            </p>
+          </div>
+        </div>
+
+        <div class="prompt-grid">
+          <article class="prompt-card">
+            <div>
+              <h3>Documento completo</h3>
+              <p>
+                Usa todas as informações da revisão original, preservando profundidade,
+                tabelas, exemplos e veredito completo.
+              </p>
+            </div>
+
+            <button id="copyFullPromptBtn" class="btn primary">
+              Copiar prompt completo
+            </button>
+          </article>
+
+          <article class="prompt-card">
+            <div>
+              <h3>Versão resumida</h3>
+              <p>
+                Gera uma versão menor do relatório, mantendo diagnóstico, pontos fortes,
+                fragilidades, prioridades e veredito.
+              </p>
+            </div>
+
+            <button id="copySummaryPromptBtn" class="btn primary">
+              Copiar prompt resumido
+            </button>
+          </article>
+        </div>
+
+        <div class="info-box">
+          <h3>Formato que a plataforma reconhece</h3>
+          <p>
+            A plataforma lê marcadores como <strong>[OBRA]</strong>,
+            <strong>[GENERO_LITERARIO]</strong> e blocos de categoria com
+            <strong>[CATEGORIA]</strong>, <strong>[TIPO_CATEGORIA]</strong>,
+            <strong>[RESUMO_CATEGORIA]</strong>, <strong>[CONTEUDO]</strong> e
+            <strong>[FIM_CATEGORIA]</strong>.
+          </p>
+        </div>
+      </section>
+
+      <section id="tab-importar" class="tab-panel">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">Entrada</span>
+            <h2>Importar texto padronizado</h2>
+            <p>
+              Cole aqui o texto organizado pela IA e clique em processar. O sistema vai
+              separar automaticamente os campos e categorias.
+            </p>
+          </div>
+
+          <button id="loadExampleBtn" class="btn secondary">
+            Carregar exemplo
+          </button>
+        </div>
+
+        <textarea
+          id="rawInput"
+          class="raw-input"
+          placeholder="Cole aqui o texto padronizado..."
+        ></textarea>
+
+        <div class="action-row">
+          <button id="parseBtn" class="btn primary">Processar texto</button>
+          <button id="goEditBtn" class="btn secondary">Ir para edição</button>
+        </div>
+      </section>
+
+      <section id="tab-editar" class="tab-panel">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">Editor</span>
+            <h2>Editar documento</h2>
+            <p>
+              Edite os dados principais ou selecione uma categoria na lateral para alterar
+              apenas aquela parte.
+            </p>
+          </div>
+        </div>
+
+        <div class="editor-layout">
+          <section class="meta-editor">
+            <h3>Dados principais</h3>
+
+            <div class="form-grid">
+              <label>
+                Título do relatório
+                <input id="fieldTituloRelatorio" type="text" />
+              </label>
+
+              <label>
+                Subtítulo
+                <input id="fieldSubtituloRelatorio" type="text" />
+              </label>
+
+              <label>
+                Obra
+                <input id="fieldObra" type="text" />
+              </label>
+
+              <label>
+                Autor
+                <input id="fieldAutor" type="text" />
+              </label>
+
+              <label>
+                Avaliador
+                <input id="fieldAvaliador" type="text" />
+              </label>
+
+              <label>
+                Tipo de revisão
+                <input id="fieldTipoRevisao" type="text" />
+              </label>
+
+              <label>
+                Escopo
+                <input id="fieldEscopo" type="text" />
+              </label>
+
+              <label>
+                Gênero literário
+                <input id="fieldGeneroLiterario" type="text" />
+              </label>
+
+              <label>
+                Público-alvo
+                <input id="fieldPublicoAlvo" type="text" />
+              </label>
+
+              <label>
+                Identidade tonal
+                <input id="fieldIdentidadeTonal" type="text" />
+              </label>
+
+              <label>
+                Estágio editorial
+                <input id="fieldEstagioEditorial" type="text" />
+              </label>
+
+              <label>
+                Status do documento
+                <input id="fieldStatusDocumento" type="text" />
+              </label>
+            </div>
+          </section>
+
+          <section class="category-editor">
+            <div class="category-editor-header">
+              <h3 id="selectedCategoryTitle">Nenhuma categoria selecionada</h3>
+              <span id="selectedCategoryType" class="category-type-pill">—</span>
+            </div>
+
+            <label>
+              Nome da categoria
+              <input id="categoryTitleInput" type="text" />
+            </label>
+
+            <label>
+              Tipo da categoria
+              <select id="categoryTypeInput">
+                <option value="texto">texto</option>
+                <option value="tabela">tabela</option>
+                <option value="lista">lista</option>
+                <option value="diagnostico">diagnostico</option>
+                <option value="personagens">personagens</option>
+                <option value="reescrita">reescrita</option>
+                <option value="gramatica">gramatica</option>
+                <option value="pontos_fortes">pontos_fortes</option>
+                <option value="pontos_fracos">pontos_fracos</option>
+                <option value="prioridades">prioridades</option>
+                <option value="plano_de_melhoria">plano_de_melhoria</option>
+                <option value="veredito">veredito</option>
+                <option value="sensibilidade">sensibilidade</option>
+                <option value="mercado">mercado</option>
+                <option value="mundo">mundo</option>
+                <option value="estrutura">estrutura</option>
+                <option value="ritmo">ritmo</option>
+                <option value="dialogos">dialogos</option>
+                <option value="prosa">prosa</option>
+                <option value="cenas">cenas</option>
+                <option value="tema">tema</option>
+                <option value="outro">outro</option>
+              </select>
+            </label>
+
+            <label>
+              Resumo da categoria
+              <textarea id="categorySummaryInput" class="small-textarea"></textarea>
+            </label>
+
+            <label>
+              Conteúdo
+              <textarea id="categoryContentInput" class="content-textarea"></textarea>
+            </label>
+
+            <div class="action-row">
+              <button id="applyCategoryBtn" class="btn primary">
+                Aplicar alterações
+              </button>
+
+              <button id="addCategoryBtn" class="btn secondary">
+                Nova categoria
+              </button>
+
+              <button id="removeCategoryBtn" class="btn danger">
+                Remover categoria
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="tab-preview" class="tab-panel">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">Documento</span>
+            <h2>Pré-visualização</h2>
+            <p>
+              Esta é a versão visual do documento. Use imprimir para salvar em PDF.
+            </p>
+          </div>
+
+          <div class="action-row no-margin">
+            <button id="refreshPreviewBtn" class="btn secondary">
+              Atualizar prévia
+            </button>
+
+            <button id="printBtn" class="btn primary">
+              Imprimir / Salvar PDF
+            </button>
+          </div>
+        </div>
+
+        <div id="documentPreview" class="document-preview"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

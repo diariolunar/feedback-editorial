@@ -41,10 +41,15 @@
 
       <section class="sidebar-section">
         <h2>Ações</h2>
+
         <div class="sidebar-actions">
           <button id="saveBtn" class="btn btn-light full">Salvar no navegador</button>
+          <button id="exportJsonBtn" class="btn btn-light full">Exportar dados JSON</button>
+          <button id="importJsonBtn" class="btn btn-light full">Importar projeto salvo</button>
           <button id="clearBtn" class="btn btn-danger full">Limpar tudo</button>
         </div>
+
+        <input id="importJsonInput" type="file" accept="application/json,.json" hidden />
       </section>
     </aside>
 
@@ -53,19 +58,30 @@
         <header class="panel-header">
           <span>Prompts</span>
           <h2>Organização automática do relatório</h2>
-          <p>Copie um prompt, cole na IA junto com a revisão editorial bruta e depois traga o texto padronizado para a plataforma.</p>
+          <p>
+            Copie um prompt, cole na IA junto com a revisão editorial bruta e depois traga o texto
+            padronizado para a plataforma.
+          </p>
         </header>
 
         <div class="ui-grid">
           <article class="ui-card">
             <h3>Documento completo</h3>
-            <p>Organiza o documento inteiro, preservando conteúdo, categorias, tabelas, exemplos, reescritas e veredito final.</p>
+            <p>
+              Organiza o documento inteiro, preservando conteúdo, categorias, tabelas, exemplos,
+              reescritas e veredito final.
+            </p>
+
             <button id="copyFullPromptBtn" class="btn btn-primary">Copiar prompt completo</button>
           </article>
 
           <article class="ui-card">
             <h3>Versão resumida</h3>
-            <p>Condensa a revisão em uma versão menor, mantendo diagnóstico, prioridades, pontos fortes, fragilidades e plano de melhoria.</p>
+            <p>
+              Condensa a revisão em uma versão menor, mantendo diagnóstico, prioridades, pontos fortes,
+              fragilidades e plano de melhoria.
+            </p>
+
             <button id="copySummaryPromptBtn" class="btn btn-primary">Copiar prompt resumido</button>
           </article>
         </div>
@@ -86,7 +102,9 @@
           <div>
             <span>Importação</span>
             <h2>Importar texto padronizado</h2>
-            <p>Cole o texto organizado pela IA. A plataforma separa os campos e monta o documento.</p>
+            <p>
+              Cole o texto organizado pela IA. A plataforma valida o padrão, separa os campos e monta o documento.
+            </p>
           </div>
 
           <button id="loadExampleBtn" class="btn btn-light">Carregar exemplo</button>
@@ -94,7 +112,10 @@
 
         <textarea id="rawInput" class="raw-input" placeholder="Cole aqui o texto padronizado..."></textarea>
 
+        <div id="validationBox" class="validation-box hidden"></div>
+
         <div class="action-row">
+          <button id="validateBtn" class="btn btn-light">Validar texto</button>
           <button id="parseBtn" class="btn btn-primary">Processar texto</button>
           <button id="goEditBtn" class="btn btn-light">Ir para edição</button>
         </div>
@@ -104,7 +125,10 @@
         <header class="panel-header">
           <span>Edição</span>
           <h2>Editar campos e categorias</h2>
-          <p>Ajuste os dados principais ou selecione uma categoria na lateral para editar apenas aquela parte.</p>
+          <p>
+            Ajuste os dados principais, informações do documento ou selecione uma categoria na lateral
+            para editar apenas aquela parte.
+          </p>
         </header>
 
         <div class="editor-grid">
@@ -112,6 +136,17 @@
             <h3>Dados principais</h3>
 
             <div class="form-grid">
+              <label>
+                Tipo de documento
+                <select id="fieldTipoDocumento">
+                  <option value="revisao_completa">Revisão completa</option>
+                  <option value="revisao_resumida">Revisão resumida</option>
+                  <option value="parecer_editorial">Parecer editorial</option>
+                  <option value="ficha_tecnica">Ficha técnica</option>
+                  <option value="leitura_critica">Relatório de leitura crítica</option>
+                </select>
+              </label>
+
               <label>Título do relatório <input id="fieldTituloRelatorio" type="text" /></label>
               <label>Subtítulo <input id="fieldSubtituloRelatorio" type="text" /></label>
               <label>Obra <input id="fieldObra" type="text" /></label>
@@ -128,6 +163,20 @@
           </section>
 
           <section class="ui-card">
+            <h3>Informações do documento</h3>
+
+            <div class="form-grid">
+              <label>Nome do projeto <input id="fieldNomeProjeto" type="text" /></label>
+              <label>Responsável <input id="fieldResponsavel" type="text" /></label>
+              <label>E-mail <input id="fieldEmailProjeto" type="text" /></label>
+              <label>Site <input id="fieldSiteProjeto" type="text" /></label>
+              <label>Data da revisão <input id="fieldDataRevisao" type="text" /></label>
+              <label>Versão do documento <input id="fieldVersaoDocumento" type="text" /></label>
+              <label>Confidencialidade <input id="fieldConfidencialidade" type="text" /></label>
+            </div>
+          </section>
+
+          <section class="ui-card category-editor-card">
             <div class="category-editor-head">
               <h3 id="selectedCategoryTitle">Nenhuma categoria selecionada</h3>
               <span id="selectedCategoryType">—</span>
@@ -192,12 +241,14 @@
           <div>
             <span>Documento final</span>
             <h2>Prévia A4 e PDF</h2>
-            <p>O relatório será montado em páginas A4 com capa, ficha técnica, conteúdo paginado e encerramento.</p>
+            <p>
+              O relatório será montado em páginas A4 com capa, ficha técnica, conteúdo paginado e encerramento.
+            </p>
           </div>
 
           <div class="action-row no-margin">
             <button id="refreshPreviewBtn" class="btn btn-light">Atualizar prévia</button>
-            <button id="generatePdfBtn" class="btn btn-primary">Gerar PDF</button>
+            <button id="generatePdfBtn" class="btn btn-primary">Gerar PDF visual</button>
           </div>
         </header>
 

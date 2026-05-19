@@ -1,4 +1,4 @@
-const STORAGE_KEY = "feedback_editorial_documento_v3";
+const STORAGE_KEY = "feedback_editorial_documento_v4";
 
 const appState = {
   selectedCategoryIndex: -1,
@@ -49,301 +49,151 @@ const META_INPUTS = {
 
 const PROMPT_COMPLETO = `Você é um organizador técnico de relatórios editoriais profissionais.
 
-Sua tarefa é pegar o texto de revisão editorial que vou enviar e reorganizá-lo em um padrão fixo, limpo, completo e altamente estruturado para ser usado em uma plataforma geradora de documentos estilizados em PDF.
+Sua tarefa é pegar o texto de revisão editorial que vou enviar e reorganizá-lo em um padrão fixo, limpo, completo e estruturado para ser usado em uma plataforma geradora de documentos em PDF.
 
-ATENÇÃO:
-Você NÃO deve fazer uma nova revisão editorial.
-Você NÃO deve resumir o conteúdo.
-Você NÃO deve reescrever o estilo do avaliador.
-Você NÃO deve suavizar críticas.
-Você NÃO deve retirar informações importantes.
-Você NÃO deve inventar informações ausentes.
-Você NÃO deve transformar o texto em artigo, ensaio ou parecer novo.
-Você deve apenas organizar, padronizar, classificar e preparar o conteúdo para diagramação.
+Não faça uma nova revisão. Não resuma. Não suavize críticas. Não invente informações. Apenas organize e padronize.
 
-REGRAS GERAIS:
-1. Preserve TODO o conteúdo relevante da revisão original.
-2. Mantenha o sentido, o tom e a profundidade da avaliação.
-3. Corrija apenas problemas de formatação evidentes.
-4. Não faça cortes de conteúdo, a menos que exista duplicação clara e acidental.
-5. Quando houver tabelas no texto original, mantenha-as como tabela em Markdown.
-6. Quando houver listas, mantenha-as como listas.
-7. Quando houver citações, trechos originais, exemplos de reescrita ou sugestões concretas, preserve-os integralmente.
-8. Quando uma informação não estiver presente, preencha o campo com: Não informado.
-9. Não explique o que você fez. Apenas entregue o texto final padronizado.
-
-FORMATO OBRIGATÓRIO:
+Use exatamente este formato:
 
 [TITULO_RELATORIO]
-Escreva aqui o título principal do relatório.
+Relatório de Revisão Editorial
 
 [SUBTITULO_RELATORIO]
-Escreva aqui o subtítulo do relatório.
+Revisão editorial extremamente detalhada
 
 [OBRA]
-Escreva aqui o nome da obra analisada.
+Nome da obra
 
 [AUTOR]
-Escreva aqui o nome do autor, se informado.
+Nome do autor ou Não informado
 
 [AVALIADOR]
-Escreva aqui o nome do avaliador, revisor ou responsável, se informado.
+Nome do avaliador ou Não informado
 
 [TIPO_REVISAO]
-Informe o tipo de revisão.
+Tipo de revisão
 
 [ESCOPO]
-Informe o escopo do material analisado.
+Escopo do material analisado
 
 [GENERO_LITERARIO]
-Informe o gênero literário aparente.
+Gênero literário aparente
 
 [SUBGENEROS_E_ELEMENTOS]
-Liste os subgêneros e elementos narrativos detectados.
+Lista de subgêneros e elementos
 
 [PUBLICO_ALVO]
-Informe o público-alvo provável.
+Público-alvo provável
 
 [IDENTIDADE_TONAL]
-Informe a identidade tonal da obra.
+Identidade tonal
 
 [PROMESSA_NARRATIVA]
-Informe a promessa narrativa central.
+Promessa narrativa central
 
 [CONFLITO_CENTRAL]
-Informe o conflito central da obra, separando em camadas se necessário.
+Conflito central
 
 [ESTAGIO_EDITORIAL]
-Informe o estágio editorial atual do manuscrito.
+Estágio editorial
 
 [NIVEL_DE_MATURIDADE]
-Informe se o texto parece rascunho inicial, intermediário, avançado ou outro diagnóstico equivalente.
+Nível de maturidade
 
 [MAIOR_FORCA]
-Informe a maior força identificada.
+Maior força
 
 [MAIOR_FRAQUEZA]
-Informe a maior fraqueza identificada.
+Maior fraqueza
 
 [VEREDITO_RESUMIDO]
-Escreva um resumo breve do parecer final.
+Resumo breve do parecer final
 
 [STATUS_DO_DOCUMENTO]
-Informe o status do documento.
+Status do documento
 
 [DATA]
-Informe a data, se houver.
+Data ou Não informado
 
 [OBSERVACOES_GERAIS]
-Inclua observações gerais importantes que não se encaixam nos campos anteriores.
+Observações gerais
 
-Depois dos campos principais, organize toda a revisão em categorias.
-
-Cada categoria deve seguir exatamente este modelo:
+Depois organize todo o restante em categorias:
 
 [CATEGORIA]
 Nome da categoria
 
 [TIPO_CATEGORIA]
-Use um dos tipos abaixo:
-texto
-tabela
-lista
-diagnostico
-personagens
-reescrita
-gramatica
-pontos_fortes
-pontos_fracos
-prioridades
-plano_de_melhoria
-veredito
-sensibilidade
-mercado
-mundo
-estrutura
-ritmo
-dialogos
-prosa
-cenas
-tema
-outro
+texto, diagnostico, estrutura, ritmo, cenas, personagens, dialogos, prosa, mundo, tema, gramatica, reescrita, pontos_fortes, pontos_fracos, prioridades, plano_de_melhoria, mercado, sensibilidade, veredito, lista, tabela ou outro
 
 [RESUMO_CATEGORIA]
-Escreva um resumo curto da categoria em 1 a 3 frases, sem perder o sentido.
+Resumo curto da categoria.
 
 [CONTEUDO]
-Cole aqui o conteúdo completo da categoria, preservando a profundidade, listas, tabelas, exemplos, citações e sugestões.
+Conteúdo completo da categoria.
 
 [FIM_CATEGORIA]
 
-CATEGORIAS ESPERADAS:
-Sempre que existirem no texto original, separe em categorias próprias os seguintes blocos:
-Antes da análise completa; Gênero literário aparente; Público-alvo provável; Identidade tonal; Promessa narrativa; Conflito central; Nível atual de maturidade do manuscrito; Maior força; Maior fraqueza; Diagnóstico editorial geral; Premissa e promessa narrativa; Estrutura narrativa; Ritmo narrativo; Engenharia de cenas; Desenvolvimento de personagens; Análise do protagonista; Forças antagônicas; Relações entre personagens; Diálogos; Voz narrativa; Ponto de vista; Prosa e estilo; Clareza; Mostrar versus contar; Subtexto; Construção emocional; Tensão narrativa; Consistência interna; Construção de mundo; Atmosfera e ambientação; Tema e simbolismo; Originalidade; Gramática e revisão técnica; Edição linha a linha; Experiência do leitor; Potencial de mercado; Sensibilidade e representação; Pontos fortes; Pontos fracos; Prioridades de reescrita; Plano prático de melhoria; Sugestões concretas de reescrita; Veredito editorial final.
+Preserve tabelas em Markdown. Preserve listas. Preserve exemplos e sugestões de reescrita.
 
-Não invente categorias ausentes.
-
-SAÍDA FINAL:
 Entregue apenas o documento padronizado.
-Não escreva introdução.
-Não escreva conclusão fora dos campos.
-Não diga “aqui está”.
-Não explique o processo.
-Não use blocos de código.
-Não use comentários adicionais.
 
-Agora organize o texto abaixo no padrão solicitado:
+Agora organize o texto abaixo:
 
 COLE AQUI O TEXTO COMPLETO DA REVISÃO EDITORIAL`;
 
 const PROMPT_RESUMIDO = `Você é um organizador técnico de relatórios editoriais profissionais.
 
-Sua tarefa é pegar o texto de revisão editorial que vou enviar e gerar uma VERSÃO RESUMIDA, organizada, clara e pronta para ser colada em uma plataforma web que cria documentos estilizados em PDF.
+Pegue a revisão editorial que vou enviar e gere uma versão resumida, profissional e estruturada para PDF.
 
-ATENÇÃO:
-Você NÃO deve criar uma nova revisão do zero.
-Você NÃO deve inventar informações.
-Você NÃO deve mudar o diagnóstico central.
-Você NÃO deve transformar críticas negativas em elogios.
-Você NÃO deve apagar problemas importantes.
-Você deve condensar o conteúdo mantendo o sentido editorial, a seriedade da análise e as principais recomendações.
+Não invente informações. Não mude o diagnóstico central. Não transforme críticas em elogios. Reduza para cerca de 20% a 35% do original.
 
-OBJETIVO DA VERSÃO RESUMIDA:
-1. Apresentar rapidamente o diagnóstico editorial da obra.
-2. Informar gênero, público-alvo, tom e estágio do manuscrito.
-3. Destacar forças principais.
-4. Destacar fragilidades principais.
-5. Listar prioridades de reescrita.
-6. Apresentar um plano prático de melhoria.
-7. Preservar algumas sugestões concretas de reescrita, se existirem.
-8. Entregar um veredito final claro, profissional e útil.
-
-REGRAS DE CONDENSAÇÃO:
-1. Reduza o texto original sem perder o diagnóstico principal.
-2. Preserve as informações mais importantes.
-3. Elimine repetições.
-4. Una ideias semelhantes.
-5. Mantenha exemplos concretos apenas quando forem muito úteis.
-6. Se houver muitas sugestões de reescrita, escolha as mais importantes.
-7. Se houver muitas categorias, agrupe categorias próximas.
-8. Não suavize o parecer.
-9. Não transforme uma obra imatura em obra pronta.
-10. Não remova críticas estruturais importantes.
-11. Mantenha tom profissional, firme, respeitoso e editorialmente útil.
-
-TAMANHO:
-A versão resumida deve ter aproximadamente entre 20% e 35% do tamanho do relatório original.
-
-FORMATO OBRIGATÓRIO:
+Use o mesmo padrão:
 
 [TITULO_RELATORIO]
-Escreva aqui o título principal do relatório.
-
 [SUBTITULO_RELATORIO]
-Versão resumida do parecer editorial
-
 [OBRA]
-Escreva aqui o nome da obra analisada.
-
 [AUTOR]
-Escreva aqui o nome do autor, se informado.
-
 [AVALIADOR]
-Escreva aqui o nome do avaliador, revisor ou responsável, se informado.
-
 [TIPO_REVISAO]
-Versão resumida de revisão editorial profissional
-
 [ESCOPO]
-Informe o escopo do material analisado.
-
 [GENERO_LITERARIO]
-Informe o gênero literário aparente.
-
 [SUBGENEROS_E_ELEMENTOS]
-Liste apenas os principais subgêneros e elementos narrativos.
-
 [PUBLICO_ALVO]
-Informe o público-alvo provável.
-
 [IDENTIDADE_TONAL]
-Informe a identidade tonal da obra.
-
 [PROMESSA_NARRATIVA]
-Resuma a promessa narrativa central em até 5 linhas.
-
 [CONFLITO_CENTRAL]
-Resuma o conflito central em até 5 linhas.
-
 [ESTAGIO_EDITORIAL]
-Informe o estágio editorial atual.
-
 [NIVEL_DE_MATURIDADE]
-Informe o nível de maturidade do manuscrito.
-
 [MAIOR_FORCA]
-Informe a maior força em até 3 linhas.
-
 [MAIOR_FRAQUEZA]
-Informe a maior fraqueza em até 3 linhas.
-
 [VEREDITO_RESUMIDO]
-Escreva um parecer resumido entre 1 e 3 parágrafos.
-
 [STATUS_DO_DOCUMENTO]
-Informe o status do documento.
-
 [DATA]
-Informe a data, se houver.
-
 [OBSERVACOES_GERAIS]
-Inclua observações gerais relevantes em até 5 linhas.
 
-Depois dos campos principais, organize o relatório resumido nas categorias abaixo.
+Depois organize nas categorias:
+Diagnóstico Editorial Geral; Gênero, Público e Tom; Premissa e Promessa Narrativa; Estrutura e Ritmo; Personagens e Relações; Prosa, Voz e Diálogos; Mundo, Tema e Originalidade; Gramática e Revisão Técnica; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Sugestões Concretas de Reescrita; Potencial de Mercado; Sensibilidade e Representação; Veredito Editorial Final.
 
-Cada categoria deve seguir exatamente este modelo:
+Cada categoria deve seguir:
 
 [CATEGORIA]
 Nome da categoria
 
 [TIPO_CATEGORIA]
-Use um tipo adequado.
+tipo
 
 [RESUMO_CATEGORIA]
 Resumo curto.
 
 [CONTEUDO]
-Conteúdo resumido da categoria.
+Conteúdo resumido.
 
 [FIM_CATEGORIA]
 
-CATEGORIAS OBRIGATÓRIAS:
-1. Diagnóstico Editorial Geral
-2. Gênero, Público e Tom
-3. Premissa e Promessa Narrativa
-4. Estrutura e Ritmo
-5. Personagens e Relações
-6. Prosa, Voz e Diálogos
-7. Mundo, Tema e Originalidade
-8. Gramática e Revisão Técnica
-9. Pontos Fortes
-10. Pontos de Atenção
-11. Prioridades de Reescrita
-12. Plano Prático de Melhoria
-13. Sugestões Concretas de Reescrita
-14. Potencial de Mercado
-15. Sensibilidade e Representação
-16. Veredito Editorial Final
-
-SAÍDA FINAL:
 Entregue apenas o documento padronizado.
-Não escreva introdução.
-Não escreva “aqui está”.
-Não explique o processo.
-Não use bloco de código.
-Não use comentários adicionais.
 
-Agora gere a versão resumida e padronizada do texto abaixo:
+Agora organize o texto abaixo:
 
 COLE AQUI O TEXTO COMPLETO DA REVISÃO EDITORIAL`;
 
@@ -379,6 +229,7 @@ function setupButtons() {
 
     appState.document = parseStandardDocument(text);
     appState.selectedCategoryIndex = appState.document.categories.length ? 0 : -1;
+
     renderAll();
     activateTab("editar");
     showToast("Texto processado com sucesso.");
@@ -421,6 +272,7 @@ function setupButtons() {
 
     appState.document.categories.splice(appState.selectedCategoryIndex, 1);
     appState.selectedCategoryIndex = appState.document.categories.length ? 0 : -1;
+
     renderAll();
     showToast("Categoria removida.");
   });
@@ -435,9 +287,12 @@ function setupButtons() {
     if (!window.confirm("Limpar tudo?")) return;
 
     localStorage.removeItem(STORAGE_KEY);
+
     appState.document = { meta: {}, categories: [] };
     appState.selectedCategoryIndex = -1;
+
     document.getElementById("rawInput").value = "";
+
     renderAll();
     showToast("Tudo limpo.");
   });
@@ -662,23 +517,38 @@ function hasContent() {
 }
 
 function renderCover(meta) {
+  const title = meta.tituloRelatorio || "Relatório de Revisão Editorial";
+  const titleParts = splitCoverTitle(title);
+
   return `
     <section class="pdf-page dark">
-      <div class="page-border"></div>
+      <div class="cover-frame"></div>
 
       <div class="cover-content">
-        <img class="cover-logo" src="./assets/logo.png" alt="Logo" />
-        <img class="cover-ornament" src="./assets/ornamento-topo.png" alt="" />
+        <div class="cover-top">
+          <img class="cover-logo" src="./assets/logo.png" alt="Logo" />
 
-        <div class="cover-kicker">${escapeHtml(meta.tipoRevisao || "Revisão Editorial Profissional")}</div>
+          <div class="cover-label">
+            Administração do Projeto
+          </div>
+        </div>
 
-        <h1 class="cover-title">${escapeHtml(meta.tituloRelatorio || "Relatório de Revisão Editorial")}</h1>
+        <div class="cover-main">
+          <div class="cover-kicker">${escapeHtml(meta.tipoRevisao || "Revisão Editorial Profissional")}</div>
 
-        <p class="cover-subtitle">${escapeHtml(meta.subtituloRelatorio || "Documento editorial detalhado")}</p>
+          <h1 class="cover-title">
+            ${escapeHtml(titleParts.first)}
+            ${titleParts.second ? `<br><strong>${escapeHtml(titleParts.second)}</strong>` : ""}
+          </h1>
 
-        <div class="cover-work-box">
-          <span>Obra analisada</span>
-          <strong>${escapeHtml(meta.obra || "Obra não informada")}</strong>
+          <p class="cover-subtitle">
+            ${escapeHtml(meta.subtituloRelatorio || "Documento técnico de análise editorial, estrutura narrativa e aprimoramento literário.")}
+          </p>
+
+          <div class="cover-work">
+            <span>Obra analisada</span>
+            <strong>${escapeHtml(meta.obra || "Obra não informada")}</strong>
+          </div>
         </div>
 
         <div class="cover-meta">
@@ -690,6 +560,29 @@ function renderCover(meta) {
       </div>
     </section>
   `;
+}
+
+function splitCoverTitle(title) {
+  const clean = String(title || "").trim();
+
+  if (!clean.includes(" ")) {
+    return { first: clean, second: "" };
+  }
+
+  if (clean.toLowerCase().includes("revisão editorial")) {
+    return {
+      first: "Relatório de",
+      second: "Revisão Editorial"
+    };
+  }
+
+  const parts = clean.split(" ");
+  const midpoint = Math.ceil(parts.length / 2);
+
+  return {
+    first: parts.slice(0, midpoint).join(" "),
+    second: parts.slice(midpoint).join(" ")
+  };
 }
 
 function coverMeta(label, value) {
@@ -721,17 +614,19 @@ function renderFicha(meta, pageNumber) {
 
   return `
     <section class="pdf-page">
-      ${renderPageHeader("Ficha Editorial", meta.obra || "Documento Editorial")}
-      <main class="page-body">
-        <div class="pdf-content-area">
-          ${meta.vereditoResumido ? `<div class="section-summary">${renderMarkdown(meta.vereditoResumido)}</div>` : ""}
+      ${renderDocHeader(meta, "Ficha Editorial")}
+      <main class="page-inner">
+        ${renderSectionTitle("Ficha Editorial", meta.obra || "Documento Editorial")}
 
-          <div class="info-grid">
-            ${rows.map(([label, value]) => `
-              <div class="info-row">
-                <div class="info-label">${escapeHtml(label)}</div>
-                <div class="info-value content">${renderMarkdown(value)}</div>
-              </div>
+        <div class="page-content-area">
+          ${meta.vereditoResumido ? `<div class="editorial-note">${renderMarkdown(meta.vereditoResumido)}</div>` : ""}
+
+          <div class="ficha-grid">
+            ${rows.map(([label, value], index) => `
+              <article class="ficha-card ${shouldBeWide(label, value, index) ? "wide" : ""}">
+                <span>${escapeHtml(label)}</span>
+                <div class="content">${renderMarkdown(value)}</div>
+              </article>
             `).join("")}
           </div>
         </div>
@@ -740,6 +635,11 @@ function renderFicha(meta, pageNumber) {
       </main>
     </section>
   `;
+}
+
+function shouldBeWide(label, value, index) {
+  const wideLabels = ["Promessa narrativa", "Conflito central", "Subgêneros e elementos", "Maior força", "Maior fraqueza"];
+  return wideLabels.includes(label) || String(value || "").length > 170 || index > 7;
 }
 
 function paginateCategory(category, startPageNumber) {
@@ -774,7 +674,9 @@ function paginateCategory(category, startPageNumber) {
   const totalParts = pages.length;
 
   const finalPages = pages.map((pageHtml, index) => {
-    return pageHtml.replaceAll("__TOTAL_PARTS__", String(totalParts)).replaceAll("__PART_NUMBER__", String(index + 1));
+    return pageHtml
+      .replaceAll("__TOTAL_PARTS__", String(totalParts))
+      .replaceAll("__PART_NUMBER__", String(index + 1));
   });
 
   return {
@@ -785,9 +687,11 @@ function paginateCategory(category, startPageNumber) {
 
 function fitsCategoryPage(category, blocks, partNumber) {
   const measure = getMeasureZone();
+
   measure.innerHTML = renderCategoryPage(category, blocks.join(""), 999, partNumber, 1, true);
 
-  const area = measure.querySelector(".pdf-content-area");
+  const area = measure.querySelector(".page-content-area");
+
   if (!area) return true;
 
   return area.scrollHeight <= area.clientHeight;
@@ -807,23 +711,26 @@ function getMeasureZone() {
 }
 
 function renderCategoryPage(category, contentHtml, pageNumber, partNumber, totalParts, isMeasure = false) {
-  const isFinal = category.type === "veredito";
   const isContinuation = partNumber > 1;
-  const title = isContinuation ? `${category.title} — continuação` : category.title;
   const partLabel = totalParts && totalParts > 1 ? `Parte ${partNumber} de ${totalParts}` : "";
+  const title = isContinuation ? `${category.title} — continuação` : category.title;
+  const isFinal = category.type === "veredito";
 
   return `
-    <section class="pdf-page ${isFinal ? "final-page" : ""}">
-      ${renderPageHeader(category.type || "Categoria", title)}
-      <main class="page-body">
-        <div class="pdf-content-area">
-          ${partLabel && !isMeasure ? `<div class="section-summary">${escapeHtml(partLabel)}</div>` : ""}
-          ${category.summary && !isContinuation ? `<div class="section-summary">${renderMarkdown(category.summary)}</div>` : ""}
+    <section class="pdf-page">
+      ${renderDocHeader(appState.document.meta, category.type || "Categoria")}
+
+      <main class="page-inner">
+        ${renderSectionTitle(category.type || "Categoria", title)}
+
+        <div class="page-content-area">
+          ${partLabel && !isMeasure ? `<div class="continuation-label">${escapeHtml(partLabel)}</div>` : ""}
+          ${category.summary && !isContinuation ? `<div class="editorial-note">${renderMarkdown(category.summary)}</div>` : ""}
 
           ${
             isFinal
-              ? `<div class="final-box"><h2>Veredito Editorial</h2><div class="content">${contentHtml}</div></div>`
-              : `<div class="content">${contentHtml}</div>`
+              ? `<div class="final-card"><h3>Veredito Editorial</h3><div class="content">${contentHtml}</div></div>`
+              : `<div class="section-box"><div class="content">${contentHtml}</div></div>`
           }
         </div>
 
@@ -833,22 +740,32 @@ function renderCategoryPage(category, contentHtml, pageNumber, partNumber, total
   `;
 }
 
-function renderPageHeader(kicker, title) {
+function renderDocHeader(meta, label) {
   return `
-    <header class="page-head">
-      <img class="page-head-full" src="./assets/ornamento-topo.png" alt="Cabeçalho do documento" />
-    </header>
+    <header class="doc-header">
+      <img class="doc-header-logo" src="./assets/logo.png" alt="Logo" />
 
-    <section class="section-title-block">
-      <span>${escapeHtml(kicker)}</span>
+      <div class="doc-header-text">
+        <span>${escapeHtml(label || "Relatório Editorial")}</span>
+        <strong>${escapeHtml(meta.obra || "Revisão Editorial Profissional")}</strong>
+      </div>
+    </header>
+  `;
+}
+
+function renderSectionTitle(kicker, title) {
+  return `
+    <div class="section-title">
+      <span class="kicker">${escapeHtml(kicker)}</span>
       <h2>${escapeHtml(title)}</h2>
-    </section>
+      <div class="title-rule"></div>
+    </div>
   `;
 }
 
 function renderFooter(meta, pageNumber) {
   return `
-    <footer class="footer">
+    <footer class="doc-footer">
       <span>${escapeHtml(meta.obra || "Relatório Editorial")}</span>
       <span>Página ${String(pageNumber).padStart(2, "0")}</span>
     </footer>
@@ -1134,10 +1051,10 @@ Relatório de Revisão Editorial
 Revisão editorial extremamente detalhada
 
 [OBRA]
-O Amado da Luzz
+Sancta Corrupta
 
 [AUTOR]
-Não informado
+Mayke Arrais
 
 [AVALIADOR]
 Administração do Projeto
@@ -1166,7 +1083,7 @@ Leitores de fantasia jovem/adulta serializada.
 Épica, trágica, redentora e dramática.
 
 [PROMESSA_NARRATIVA]
-Um príncipe alto-elfo sobrevivente de um genocídio descobre que carrega uma linhagem sagrada, uma profecia e uma função decisiva na luta contra uma sombra primordial.
+Um protagonista marcado por trauma descobre que carrega uma função decisiva em uma guerra de escala espiritual, política e emocional.
 
 [CONFLITO_CENTRAL]
 O conflito opera em três camadas: externo, interno e relacional.
@@ -1178,7 +1095,7 @@ Intermediário promissor.
 Rascunho intermediário com estrutura já desenhada.
 
 [MAIOR_FORCA]
-Vocação épica combinada com found family.
+Vocação épica combinada com reconstrução emocional.
 
 [MAIOR_FRAQUEZA]
 Excesso de intensidade sem variação suficiente.
@@ -1207,7 +1124,7 @@ O manuscrito apresenta uma fantasia épica promissora, mas ainda dependente de a
 [CONTEUDO]
 O manuscrito tem uma ambição clara: quer ser uma fantasia épica de grande escala, com tom mítico, personagens marcados por tragédias pessoais e um mundo ameaçado por uma força primordial.
 
-A força literária do texto aparece principalmente na energia da jornada. O leitor entende que Arion saiu de um lugar de destruição absoluta e está sendo empurrado para um destino que não pediu.
+A força literária do texto aparece principalmente na energia da jornada. O leitor entende que o protagonista saiu de um lugar de destruição absoluta e está sendo empurrado para um destino que não pediu.
 
 ## Pontos principais
 
@@ -1237,9 +1154,9 @@ Os personagens têm funções claras, mas precisam de mais individualidade, cont
 | Thalia | Aliada elemental | Poder visual e trauma forte | Pode ser reduzida ao cuidado com Arion | Dar objetivos próprios |
 | Bakrium | Antagonista ambíguo | Carisma e tensão moral | Redenção pode parecer rápida | Construir confiança lentamente |
 
-Arion sustenta a história porque carrega uma ferida clara: ele sobreviveu ao fim de Eldanesh e se culpa por isso. Essa ferida dá coerência ao seu isolamento, sua vida como mercenário e sua resistência ao chamado.
+O protagonista sustenta a história porque carrega uma ferida clara. Essa ferida dá coerência ao seu isolamento, sua resistência ao chamado e sua dificuldade de confiar.
 
-Thalia possui forte potencial emocional, mas precisa de objetivos próprios além do cuidado com Arion. Draven precisa ter sua mutilação tratada como arco contínuo, não apenas como choque de batalha. Tark deve resolver problemas maiores com inteligência, não apenas servir como alívio cômico.
+Os personagens secundários precisam deixar de funcionar apenas como apoio do arco principal. Cada um deve carregar desejo próprio, contradição e consequência emocional.
 
 [FIM_CATEGORIA]
 
@@ -1269,7 +1186,7 @@ Transformar intensidade em substituto de profundidade.
 
 Existe uma saga aqui. Existe um protagonista. Existe um antagonista promissor. Existe uma mitologia com potencial. A próxima etapa não é diminuir a fantasia, nem tirar a grandiosidade. É dar sustentação a ela.
 
-Quando essa pergunta começar a contaminar cada vitória, cada aliança e cada escolha, O Amado da Luzz deixará de ser apenas uma fantasia épica promissora e começará a se tornar uma história realmente memorável.
+Quando essa pergunta começar a contaminar cada vitória, cada aliança e cada escolha, a obra deixará de ser apenas uma fantasia épica promissora e começará a se tornar uma história realmente memorável.
 
 [FIM_CATEGORIA]`;
 }

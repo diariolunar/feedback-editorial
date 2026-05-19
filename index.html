@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Feedback Editorial</title>
 
   <link rel="stylesheet" href="./styles.css" />
@@ -12,81 +11,84 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="./script.js" defer></script>
 </head>
-
 <body>
-  <div class="app">
+  <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand">
-        <img src="./assets/logo.png" alt="Logo" class="brand-logo" />
+      <div class="sidebar-brand">
+        <img src="./assets/logo.png" alt="Logo do projeto" class="sidebar-logo" />
 
-        <div>
+        <div class="sidebar-brand-text">
           <h1>Feedback Editorial</h1>
-          <p>Gerador profissional de relatórios</p>
+          <p>Gerador de relatório editorial profissional</p>
         </div>
       </div>
 
-      <nav class="tabs" aria-label="Navegação principal">
-        <button class="tab-btn active" data-tab="prompts">Prompts</button>
-        <button class="tab-btn" data-tab="importar">Importar</button>
-        <button class="tab-btn" data-tab="editar">Editar</button>
-        <button class="tab-btn" data-tab="preview">Prévia e PDF</button>
+      <nav class="sidebar-nav" aria-label="Etapas da plataforma">
+        <button class="nav-btn active" data-tab="prompts">1. Prompts</button>
+        <button class="nav-btn" data-tab="importar">2. Importar</button>
+        <button class="nav-btn" data-tab="editar">3. Editar</button>
+        <button class="nav-btn" data-tab="preview">4. Prévia e PDF</button>
       </nav>
 
-      <section class="side-panel">
+      <section class="sidebar-box">
         <h2>Categorias</h2>
-
         <div id="categoryList" class="category-list">
-          <p class="side-empty">Nenhuma categoria carregada.</p>
+          <p class="empty-note">Nenhuma categoria carregada.</p>
         </div>
       </section>
 
-      <section class="side-panel compact">
+      <section class="sidebar-box">
         <h2>Ações</h2>
 
-        <button id="saveBtn" class="btn side full">Salvar no navegador</button>
-        <button id="clearBtn" class="btn danger full">Limpar tudo</button>
+        <div class="sidebar-actions">
+          <button id="saveBtn" class="btn btn-soft full">Salvar no navegador</button>
+          <button id="clearBtn" class="btn btn-danger full">Limpar tudo</button>
+        </div>
       </section>
     </aside>
 
-    <main class="main">
+    <main class="main-content">
+      <!-- TAB PROMPTS -->
       <section id="tab-prompts" class="tab-panel active">
-        <header class="workspace-header">
-          <span>Biblioteca de Prompts</span>
-          <h2>Organização automática do relatório</h2>
+        <header class="panel-header">
+          <span class="eyebrow">PROMPTS</span>
+          <h2>Biblioteca de prompts</h2>
           <p>
             Copie um prompt, cole na IA junto com a revisão editorial bruta e depois traga o texto
-            padronizado para a aba Importar.
+            padronizado para a plataforma.
           </p>
         </header>
 
-        <div class="prompt-grid">
-          <article class="app-card prompt-card">
-            <h3>Documento completo</h3>
+        <div class="cards-grid">
+          <article class="ui-card">
+            <h3>Prompt completo</h3>
             <p>
-              Mantém o conteúdo integral da análise, separando campos, categorias,
-              tabelas, exemplos, reescritas e veredito final.
+              Organiza o documento inteiro, preservando diagnóstico, tabelas, categorias,
+              reescritas, observações, prioridades e veredito final.
             </p>
 
-            <button id="copyFullPromptBtn" class="btn primary">Copiar prompt completo</button>
+            <button id="copyFullPromptBtn" class="btn btn-primary">Copiar prompt completo</button>
           </article>
 
-          <article class="app-card prompt-card">
-            <h3>Versão resumida</h3>
+          <article class="ui-card">
+            <h3>Prompt resumido</h3>
             <p>
-              Condensa a revisão em um relatório menor, preservando diagnóstico,
-              prioridades, pontos fortes, fragilidades e plano de melhoria.
+              Gera uma versão mais compacta, mantendo os pontos centrais da análise editorial,
+              com foco em clareza e aproveitamento no relatório.
             </p>
 
-            <button id="copySummaryPromptBtn" class="btn primary">Copiar prompt resumido</button>
+            <button id="copySummaryPromptBtn" class="btn btn-primary">Copiar prompt resumido</button>
           </article>
         </div>
 
-        <article class="app-card info-card">
-          <h3>Padrão reconhecido</h3>
+        <article class="ui-card info-card">
+          <h3>Formato reconhecido pela plataforma</h3>
 
           <p>
-            A plataforma reconhece campos como <strong>[OBRA]</strong>,
-            <strong>[GENERO_LITERARIO]</strong>, <strong>[PUBLICO_ALVO]</strong> e blocos com
+            A plataforma reconhece campos como:
+            <strong>[OBRA]</strong>, <strong>[GENERO_LITERARIO]</strong>,
+            <strong>[PUBLICO_ALVO]</strong>, <strong>[IDENTIDADE_TONAL]</strong>,
+            <strong>[VEREDITO_RESUMIDO]</strong> e blocos de categoria com:
             <strong>[CATEGORIA]</strong>, <strong>[TIPO_CATEGORIA]</strong>,
             <strong>[RESUMO_CATEGORIA]</strong>, <strong>[CONTEUDO]</strong> e
             <strong>[FIM_CATEGORIA]</strong>.
@@ -94,139 +96,195 @@
         </article>
       </section>
 
+      <!-- TAB IMPORTAR -->
       <section id="tab-importar" class="tab-panel">
-        <header class="workspace-header with-action">
+        <header class="panel-header panel-header-actions">
           <div>
-            <span>Entrada</span>
+            <span class="eyebrow">IMPORTAÇÃO</span>
             <h2>Importar texto padronizado</h2>
             <p>
-              Cole o texto organizado pela IA. A plataforma separa os campos e monta o documento.
+              Cole aqui o texto organizado pela IA. A plataforma vai separar os campos e montar o documento.
             </p>
           </div>
 
-          <button id="loadExampleBtn" class="btn secondary">Carregar exemplo</button>
+          <button id="loadExampleBtn" class="btn btn-soft">Carregar exemplo</button>
         </header>
 
-        <textarea id="rawInput" class="raw-input" placeholder="Cole aqui o texto padronizado..."></textarea>
+        <textarea
+          id="rawInput"
+          class="raw-input"
+          placeholder="Cole aqui o texto padronizado..."
+        ></textarea>
 
         <div class="action-row">
-          <button id="parseBtn" class="btn primary">Processar texto</button>
-          <button id="goEditBtn" class="btn secondary">Ir para edição</button>
+          <button id="parseBtn" class="btn btn-primary">Processar texto</button>
+          <button id="goEditBtn" class="btn btn-soft">Ir para edição</button>
         </div>
       </section>
 
+      <!-- TAB EDITAR -->
       <section id="tab-editar" class="tab-panel">
-        <header class="workspace-header">
-          <span>Editor</span>
+        <header class="panel-header">
+          <span class="eyebrow">EDIÇÃO</span>
           <h2>Editar campos e categorias</h2>
           <p>
-            Ajuste os dados principais ou escolha uma categoria na lateral para editar somente aquela parte.
+            Ajuste os dados principais do relatório ou selecione uma categoria na lateral para editar apenas aquela parte.
           </p>
         </header>
 
-        <div class="editor-grid">
-          <section class="app-card">
+        <div class="editor-layout">
+          <section class="ui-card">
             <h3>Dados principais</h3>
 
             <div class="form-grid">
-              <label>Título do relatório <input id="fieldTituloRelatorio" type="text" /></label>
-              <label>Subtítulo <input id="fieldSubtituloRelatorio" type="text" /></label>
-              <label>Obra <input id="fieldObra" type="text" /></label>
-              <label>Autor <input id="fieldAutor" type="text" /></label>
-              <label>Avaliador <input id="fieldAvaliador" type="text" /></label>
-              <label>Tipo de revisão <input id="fieldTipoRevisao" type="text" /></label>
-              <label>Escopo <input id="fieldEscopo" type="text" /></label>
-              <label>Gênero literário <input id="fieldGeneroLiterario" type="text" /></label>
-              <label>Público-alvo <input id="fieldPublicoAlvo" type="text" /></label>
-              <label>Identidade tonal <input id="fieldIdentidadeTonal" type="text" /></label>
-              <label>Estágio editorial <input id="fieldEstagioEditorial" type="text" /></label>
-              <label>Status do documento <input id="fieldStatusDocumento" type="text" /></label>
+              <label>
+                Título do relatório
+                <input id="fieldTituloRelatorio" type="text" />
+              </label>
+
+              <label>
+                Subtítulo
+                <input id="fieldSubtituloRelatorio" type="text" />
+              </label>
+
+              <label>
+                Obra
+                <input id="fieldObra" type="text" />
+              </label>
+
+              <label>
+                Autor
+                <input id="fieldAutor" type="text" />
+              </label>
+
+              <label>
+                Avaliador
+                <input id="fieldAvaliador" type="text" />
+              </label>
+
+              <label>
+                Tipo de revisão
+                <input id="fieldTipoRevisao" type="text" />
+              </label>
+
+              <label>
+                Escopo
+                <input id="fieldEscopo" type="text" />
+              </label>
+
+              <label>
+                Gênero literário
+                <input id="fieldGeneroLiterario" type="text" />
+              </label>
+
+              <label>
+                Público-alvo
+                <input id="fieldPublicoAlvo" type="text" />
+              </label>
+
+              <label>
+                Identidade tonal
+                <input id="fieldIdentidadeTonal" type="text" />
+              </label>
+
+              <label>
+                Estágio editorial
+                <input id="fieldEstagioEditorial" type="text" />
+              </label>
+
+              <label>
+                Status do documento
+                <input id="fieldStatusDocumento" type="text" />
+              </label>
             </div>
           </section>
 
-          <section class="app-card category-editor">
+          <section class="ui-card">
             <div class="category-editor-head">
-              <h3 id="selectedCategoryTitle">Nenhuma categoria selecionada</h3>
-              <span id="selectedCategoryType">—</span>
+              <div>
+                <h3 id="selectedCategoryTitle">Nenhuma categoria selecionada</h3>
+                <p id="selectedCategoryType" class="category-type-label">—</p>
+              </div>
             </div>
 
-            <label>
-              Nome da categoria
-              <input id="categoryTitleInput" type="text" />
-            </label>
+            <div class="form-grid">
+              <label>
+                Nome da categoria
+                <input id="categoryTitleInput" type="text" />
+              </label>
 
-            <label>
-              Tipo da categoria
-              <select id="categoryTypeInput">
-                <option value="texto">texto</option>
-                <option value="diagnostico">diagnostico</option>
-                <option value="estrutura">estrutura</option>
-                <option value="ritmo">ritmo</option>
-                <option value="cenas">cenas</option>
-                <option value="personagens">personagens</option>
-                <option value="dialogos">dialogos</option>
-                <option value="prosa">prosa</option>
-                <option value="mundo">mundo</option>
-                <option value="tema">tema</option>
-                <option value="gramatica">gramatica</option>
-                <option value="reescrita">reescrita</option>
-                <option value="pontos_fortes">pontos_fortes</option>
-                <option value="pontos_fracos">pontos_fracos</option>
-                <option value="prioridades">prioridades</option>
-                <option value="plano_de_melhoria">plano_de_melhoria</option>
-                <option value="mercado">mercado</option>
-                <option value="sensibilidade">sensibilidade</option>
-                <option value="veredito">veredito</option>
-                <option value="lista">lista</option>
-                <option value="tabela">tabela</option>
-                <option value="outro">outro</option>
-              </select>
-            </label>
+              <label>
+                Tipo da categoria
+                <select id="categoryTypeInput">
+                  <option value="texto">texto</option>
+                  <option value="diagnostico">diagnostico</option>
+                  <option value="estrutura">estrutura</option>
+                  <option value="ritmo">ritmo</option>
+                  <option value="cenas">cenas</option>
+                  <option value="personagens">personagens</option>
+                  <option value="dialogos">dialogos</option>
+                  <option value="prosa">prosa</option>
+                  <option value="mundo">mundo</option>
+                  <option value="tema">tema</option>
+                  <option value="gramatica">gramatica</option>
+                  <option value="reescrita">reescrita</option>
+                  <option value="pontos_fortes">pontos_fortes</option>
+                  <option value="pontos_fracos">pontos_fracos</option>
+                  <option value="prioridades">prioridades</option>
+                  <option value="plano_de_melhoria">plano_de_melhoria</option>
+                  <option value="mercado">mercado</option>
+                  <option value="sensibilidade">sensibilidade</option>
+                  <option value="veredito">veredito</option>
+                  <option value="lista">lista</option>
+                  <option value="tabela">tabela</option>
+                  <option value="outro">outro</option>
+                </select>
+              </label>
 
-            <label>
-              Resumo da categoria
-              <textarea id="categorySummaryInput" class="small-area"></textarea>
-            </label>
+              <label>
+                Resumo da categoria
+                <textarea id="categorySummaryInput" class="small-area"></textarea>
+              </label>
 
-            <label>
-              Conteúdo
-              <textarea id="categoryContentInput" class="big-area"></textarea>
-            </label>
+              <label>
+                Conteúdo
+                <textarea id="categoryContentInput" class="big-area"></textarea>
+              </label>
+            </div>
 
             <div class="action-row">
-              <button id="applyCategoryBtn" class="btn primary">Aplicar alterações</button>
-              <button id="addCategoryBtn" class="btn secondary">Nova categoria</button>
-              <button id="removeCategoryBtn" class="btn danger">Remover</button>
+              <button id="applyCategoryBtn" class="btn btn-primary">Aplicar alterações</button>
+              <button id="addCategoryBtn" class="btn btn-soft">Nova categoria</button>
+              <button id="removeCategoryBtn" class="btn btn-danger">Remover</button>
             </div>
           </section>
         </div>
       </section>
 
+      <!-- TAB PREVIEW -->
       <section id="tab-preview" class="tab-panel">
-        <header class="workspace-header with-action">
+        <header class="panel-header panel-header-actions">
           <div>
-            <span>Documento Final</span>
+            <span class="eyebrow">PRÉVIA FINAL</span>
             <h2>Prévia A4 e geração de PDF</h2>
             <p>
-              O documento será gerado em páginas A4 com capa, ficha técnica, conteúdo paginado e encerramento.
+              O documento será montado em páginas A4 diagramadas e depois exportado como PDF.
             </p>
           </div>
 
-          <div class="action-row top-actions">
-            <button id="refreshPreviewBtn" class="btn secondary">Atualizar prévia</button>
-            <button id="generatePdfBtn" class="btn primary">Gerar PDF</button>
+          <div class="action-row no-margin">
+            <button id="refreshPreviewBtn" class="btn btn-soft">Atualizar prévia</button>
+            <button id="generatePdfBtn" class="btn btn-primary">Gerar PDF</button>
           </div>
         </header>
 
-        <div id="pdfStatus" class="pdf-status hidden">
-          Gerando PDF. Aguarde...
-        </div>
+        <div id="pdfStatus" class="pdf-status hidden">Gerando PDF. Aguarde...</div>
 
         <div id="documentPreview" class="document-preview"></div>
       </section>
     </main>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" aria-live="polite"></div>
 </body>
 </html>

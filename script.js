@@ -1,4 +1,4 @@
-const STORAGE_KEY = "feedback_editorial_documento_v4";
+const STORAGE_KEY = "feedback_editorial_documento_v5";
 
 const appState = {
   selectedCategoryIndex: -1,
@@ -502,8 +502,8 @@ function renderPreview() {
 
   let pageNumber = 3;
 
-  appState.document.categories.forEach((category) => {
-    const categoryPages = paginateCategory(category, pageNumber);
+  appState.document.categories.forEach((category, index) => {
+    const categoryPages = paginateCategory(category, pageNumber, index + 1);
     pages.push(...categoryPages.htmlPages);
     pageNumber += categoryPages.count;
   });
@@ -565,10 +565,6 @@ function renderCover(meta) {
 function splitCoverTitle(title) {
   const clean = String(title || "").trim();
 
-  if (!clean.includes(" ")) {
-    return { first: clean, second: "" };
-  }
-
   if (clean.toLowerCase().includes("revisão editorial")) {
     return {
       first: "Relatório de",
@@ -614,10 +610,9 @@ function renderFicha(meta, pageNumber) {
 
   return `
     <section class="pdf-page">
-      ${renderDocHeader(meta, "Ficha Editorial")}
-      <main class="page-inner">
-        ${renderSectionTitle("Ficha Editorial", meta.obra || "Documento Editorial")}
+      ${renderDocHeader(meta, "Ficha Editorial", 1, meta.obra || "Documento Editorial")}
 
+      <main class="page-inner">
         <div class="page-content-area">
           ${meta.vereditoResumido ? `<div class="editorial-note">${renderMarkdown(meta.vereditoResumido)}</div>` : ""}
 
@@ -642,7 +637,7 @@ function shouldBeWide(label, value, index) {
   return wideLabels.includes(label) || String(value || "").length > 170 || index > 7;
 }
 
-function paginateCategory(category, startPageNumber) {
+function paginateCategory(category, startPageNumber, categoryNumber) {
   const blocks = markdownToBlocks(category.content || "");
   const pages = [];
   let currentBlocks = [];
@@ -650,15 +645,15 @@ function paginateCategory(category, startPageNumber) {
   let currentPart = 1;
 
   if (!blocks.length) {
-    pages.push(renderCategoryPage(category, "", currentPageNumber, currentPart, 1));
+    pages.push(renderCategoryPage(category, "", currentPageNumber, currentPart, 1, categoryNumber));
     return { htmlPages: pages, count: 1 };
   }
 
   blocks.forEach((block) => {
     const candidate = [...currentBlocks, block];
 
-    if (currentBlocks.length && !fitsCategoryPage(category, candidate, currentPart)) {
-      pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0));
+    if (currentBlocks.length && !fitsCategoryPage(category, candidate, currentPart, categoryNumber)) {
+      pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0, categoryNumber));
       currentPageNumber += 1;
       currentPart += 1;
       currentBlocks = [block];
@@ -668,7 +663,7 @@ function paginateCategory(category, startPageNumber) {
   });
 
   if (currentBlocks.length) {
-    pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0));
+    pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0, categoryNumber));
   }
 
   const totalParts = pages.length;
@@ -685,10 +680,10 @@ function paginateCategory(category, startPageNumber) {
   };
 }
 
-function fitsCategoryPage(category, blocks, partNumber) {
+function fitsCategoryPage(category, blocks, partNumber, categoryNumber) {
   const measure = getMeasureZone();
 
-  measure.innerHTML = renderCategoryPage(category, blocks.join(""), 999, partNumber, 1, true);
+  measure.innerHTML = renderCategoryPage(category, blocks.join(""), 999, partNumber, 1, categoryNumber, true);
 
   const area = measure.querySelector(".page-content-area");
 
@@ -710,7 +705,7 @@ function getMeasureZone() {
   return zone;
 }
 
-function renderCategoryPage(category, contentHtml, pageNumber, partNumber, totalParts, isMeasure = false) {
+function renderCategoryPage(category, contentHtml, pageNumber, partNumber, totalParts, categoryNumber, isMeasure = false) {
   const isContinuation = partNumber > 1;
   const partLabel = totalParts && totalParts > 1 ? `Parte ${partNumber} de ${totalParts}` : "";
   const title = isContinuation ? `${category.title} — continuação` : category.title;
@@ -718,12 +713,12 @@ function renderCategoryPage(category, contentHtml, pageNumber, partNumber, total
 
   return `
     <section class="pdf-page">
-      ${renderDocHeader(appState.document.meta, category.type || "Categoria")}
+      ${renderDocHeader(appState.document.meta, category.type || "Categoria", categoryNumber, title)}
 
       <main class="page-inner">
-        ${renderSectionTitle(category.type || "Categoria", title)}
-
         <div class="page-content-area">
+          ${renderSectionHeading(category.type || "Categoria", title, categoryNumber)}
+
           ${partLabel && !isMeasure ? `<div class="continuation-label">${escapeHtml(partLabel)}</div>` : ""}
           ${category.summary && !isContinuation ? `<div class="editorial-note">${renderMarkdown(category.summary)}</div>` : ""}
 
@@ -740,25 +735,32 @@ function renderCategoryPage(category, contentHtml, pageNumber, partNumber, total
   `;
 }
 
-function renderDocHeader(meta, label) {
+function renderDocHeader(meta, label, number, title) {
   return `
     <header class="doc-header">
       <img class="doc-header-logo" src="./assets/logo.png" alt="Logo" />
 
-      <div class="doc-header-text">
+      <div class="doc-header-title">
         <span>${escapeHtml(label || "Relatório Editorial")}</span>
-        <strong>${escapeHtml(meta.obra || "Revisão Editorial Profissional")}</strong>
+        <strong><span class="doc-number">${escapeHtml(String(number || ""))}.</span>${escapeHtml(title || meta.obra || "Revisão Editorial")}</strong>
+        <div class="doc-header-rule"></div>
       </div>
+
+      <div class="doc-header-mark"></div>
     </header>
   `;
 }
 
-function renderSectionTitle(kicker, title) {
+function renderSectionHeading(kicker, title, number) {
   return `
-    <div class="section-title">
-      <span class="kicker">${escapeHtml(kicker)}</span>
-      <h2>${escapeHtml(title)}</h2>
-      <div class="title-rule"></div>
+    <div class="section-heading">
+      <div class="section-icon">${escapeHtml(String(number || ""))}</div>
+
+      <div class="section-heading-text">
+        <span>${escapeHtml(kicker)}</span>
+        <h2>${escapeHtml(title)}</h2>
+        <div class="section-rule"></div>
+      </div>
     </div>
   `;
 }
@@ -766,8 +768,18 @@ function renderSectionTitle(kicker, title) {
 function renderFooter(meta, pageNumber) {
   return `
     <footer class="doc-footer">
-      <span>${escapeHtml(meta.obra || "Relatório Editorial")}</span>
-      <span>Página ${String(pageNumber).padStart(2, "0")}</span>
+      <div class="doc-footer-brand">
+        <img class="doc-footer-logo" src="./assets/logo.png" alt="Logo" />
+
+        <div class="doc-footer-title">
+          <strong>Administração do Projeto</strong>
+          <span>Grupo de Gestão e Estratégia</span>
+        </div>
+      </div>
+
+      <div class="doc-footer-page">
+        Página ${String(pageNumber).padStart(2, "0")}
+      </div>
     </footer>
   `;
 }

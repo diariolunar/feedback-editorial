@@ -1,4 +1,4 @@
-const STORAGE_KEY = "feedback_editorial_documento_v5";
+const STORAGE_KEY = "feedback_editorial_documento_v6";
 
 const appState = {
   selectedCategoryIndex: -1,
@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function setupTabs() {
-  document.querySelectorAll(".tab-btn").forEach((button) => {
+  document.querySelectorAll(".nav-btn").forEach((button) => {
     button.addEventListener("click", () => activateTab(button.dataset.tab));
   });
 }
@@ -244,7 +244,7 @@ function setupButtons() {
   });
 
   document.getElementById("applyCategoryBtn").addEventListener("click", () => {
-    applyCategoryEditor();
+    applyCategoryEditor(false);
     renderAll();
     showToast("Categoria atualizada.");
   });
@@ -284,13 +284,11 @@ function setupButtons() {
   });
 
   document.getElementById("clearBtn").addEventListener("click", () => {
-    if (!window.confirm("Limpar tudo?")) return;
+    if (!window.confirm("Limpar todos os dados?")) return;
 
     localStorage.removeItem(STORAGE_KEY);
-
     appState.document = { meta: {}, categories: [] };
     appState.selectedCategoryIndex = -1;
-
     document.getElementById("rawInput").value = "";
 
     renderAll();
@@ -307,7 +305,7 @@ function setupButtons() {
 }
 
 function activateTab(tabName) {
-  document.querySelectorAll(".tab-btn").forEach((button) => {
+  document.querySelectorAll(".nav-btn").forEach((button) => {
     button.classList.toggle("active", button.dataset.tab === tabName);
   });
 
@@ -340,7 +338,6 @@ function parseMeta(text) {
   matches.forEach((match, index) => {
     const marker = match[1];
     const key = FIELD_MAP[marker];
-
     if (!key) return;
 
     const start = match.index + match[0].length;
@@ -357,16 +354,16 @@ function parseCategories(text) {
 
   return blocks
     .map((block) => {
-      const clean = block.split("[FIM_CATEGORIA]")[0];
+      const cleanBlock = block.split("[FIM_CATEGORIA]")[0];
 
       return {
-        title: readBetween(clean, null, "[TIPO_CATEGORIA]").trim() || "Categoria sem título",
-        type: readBetween(clean, "[TIPO_CATEGORIA]", "[RESUMO_CATEGORIA]").trim() || "texto",
-        summary: readBetween(clean, "[RESUMO_CATEGORIA]", "[CONTEUDO]").trim(),
-        content: readBetween(clean, "[CONTEUDO]", null).trim()
+        title: readBetween(cleanBlock, null, "[TIPO_CATEGORIA]").trim() || "Categoria sem título",
+        type: readBetween(cleanBlock, "[TIPO_CATEGORIA]", "[RESUMO_CATEGORIA]").trim() || "texto",
+        summary: readBetween(cleanBlock, "[RESUMO_CATEGORIA]", "[CONTEUDO]").trim(),
+        content: readBetween(cleanBlock, "[CONTEUDO]", null).trim()
       };
     })
-    .filter((category) => category.title || category.content);
+    .filter((item) => item.title || item.content);
 }
 
 function readBetween(text, startMarker, endMarker) {
@@ -407,7 +404,7 @@ function renderCategoryList() {
   const categories = appState.document.categories;
 
   if (!categories.length) {
-    container.innerHTML = `<p class="side-empty">Nenhuma categoria carregada.</p>`;
+    container.innerHTML = `<p class="empty-note">Nenhuma categoria carregada.</p>`;
     return;
   }
 
@@ -455,7 +452,7 @@ function renderCategoryEditor() {
     return;
   }
 
-  titleDisplay.textContent = category.title;
+  titleDisplay.textContent = category.title || "Categoria";
   typeDisplay.textContent = category.type || "texto";
   titleInput.value = category.title || "";
   typeInput.value = category.type || "texto";
@@ -463,9 +460,8 @@ function renderCategoryEditor() {
   contentInput.value = category.content || "";
 }
 
-function applyCategoryEditor(showMessage = true) {
+function applyCategoryEditor(showToastMessage = true) {
   const category = appState.document.categories[appState.selectedCategoryIndex];
-
   if (!category) return;
 
   category.title = document.getElementById("categoryTitleInput").value.trim() || "Categoria sem título";
@@ -473,14 +469,12 @@ function applyCategoryEditor(showMessage = true) {
   category.summary = document.getElementById("categorySummaryInput").value.trim();
   category.content = document.getElementById("categoryContentInput").value.trim();
 
-  if (showMessage) {
-    showToast("Alterações aplicadas.");
-  }
+  if (showToastMessage) showToast("Alterações aplicadas.");
 }
 
 function syncAllEditors() {
-  Object.entries(META_INPUTS).forEach(([key, id]) => {
-    appState.document.meta[key] = document.getElementById(id).value;
+  Object.entries(META_INPUTS).forEach(([key, inputId]) => {
+    appState.document.meta[key] = document.getElementById(inputId).value.trim();
   });
 
   applyCategoryEditor(false);
@@ -490,75 +484,97 @@ function renderPreview() {
   const container = document.getElementById("documentPreview");
 
   if (!hasContent()) {
-    container.innerHTML = `<article class="app-card">Nenhum documento carregado ainda.</article>`;
+    container.innerHTML = `<article class="ui-card">Nenhum documento carregado ainda.</article>`;
     return;
   }
 
-  const meta = appState.document.meta;
   const pages = [];
+  const meta = appState.document.meta;
 
-  pages.push(renderCover(meta));
-  pages.push(renderFicha(meta, 2));
+  let currentPage = 1;
 
-  let pageNumber = 3;
+  pages.push(renderCoverPage(meta, currentPage));
+  currentPage += 1;
+
+  pages.push(renderFichaPage(meta, currentPage));
+  currentPage += 1;
 
   appState.document.categories.forEach((category, index) => {
-    const categoryPages = paginateCategory(category, pageNumber, index + 1);
-    pages.push(...categoryPages.htmlPages);
-    pageNumber += categoryPages.count;
+    const categoryPages = paginateCategory(category, currentPage, index + 1);
+    pages.push(...categoryPages.pages);
+    currentPage += categoryPages.count;
   });
+
+  if (!hasVereditoCategory() && (meta.vereditoResumido || meta.observacoesGerais)) {
+    pages.push(renderClosingPage(meta, currentPage));
+  }
 
   container.innerHTML = pages.join("");
 }
 
 function hasContent() {
   return Object.values(appState.document.meta || {}).some((value) => String(value || "").trim()) ||
-    appState.document.categories.length > 0;
+    (appState.document.categories || []).length > 0;
 }
 
-function renderCover(meta) {
+function hasVereditoCategory() {
+  return appState.document.categories.some((category) => (category.type || "").toLowerCase() === "veredito");
+}
+
+/* ---------- RENDERIZAÇÃO DAS PÁGINAS ---------- */
+
+function renderCoverPage(meta, pageNumber) {
   const title = meta.tituloRelatorio || "Relatório de Revisão Editorial";
-  const titleParts = splitCoverTitle(title);
+  const split = splitCoverTitle(title);
 
   return `
-    <section class="pdf-page dark">
+    <section class="a4-page cover-page">
       <div class="cover-frame"></div>
 
-      <div class="cover-content">
-        <div class="cover-top">
+      <div class="cover-wrap">
+        <div class="cover-header">
           <img class="cover-logo" src="./assets/logo.png" alt="Logo" />
 
-          <div class="cover-label">
-            Administração do Projeto
-          </div>
+          <div class="cover-header-note">Administração do Projeto</div>
         </div>
 
-        <div class="cover-main">
+        <div class="cover-body">
           <div class="cover-kicker">${escapeHtml(meta.tipoRevisao || "Revisão Editorial Profissional")}</div>
 
           <h1 class="cover-title">
-            ${escapeHtml(titleParts.first)}
-            ${titleParts.second ? `<br><strong>${escapeHtml(titleParts.second)}</strong>` : ""}
+            ${escapeHtml(split.first)}
+            ${split.second ? `<br><strong>${escapeHtml(split.second)}</strong>` : ""}
           </h1>
 
           <p class="cover-subtitle">
-            ${escapeHtml(meta.subtituloRelatorio || "Documento técnico de análise editorial, estrutura narrativa e aprimoramento literário.")}
+            ${escapeHtml(meta.subtituloRelatorio || "Documento técnico de análise editorial, estrutura narrativa, revisão crítica e encaminhamento de aprimoramento literário.")}
           </p>
 
-          <div class="cover-work">
+          <div class="cover-work-box">
             <span>Obra analisada</span>
             <strong>${escapeHtml(meta.obra || "Obra não informada")}</strong>
           </div>
-        </div>
 
-        <div class="cover-meta">
-          ${coverMeta("Autor", meta.autor)}
-          ${coverMeta("Avaliador", meta.avaliador)}
-          ${coverMeta("Escopo", meta.escopo)}
-          ${coverMeta("Status", meta.statusDocumento)}
+          <div class="cover-meta-grid">
+            ${renderCoverMetaItem("Autor", meta.autor)}
+            ${renderCoverMetaItem("Avaliador", meta.avaliador)}
+            ${renderCoverMetaItem("Escopo", meta.escopo)}
+            ${renderCoverMetaItem("Status", meta.statusDocumento)}
+          </div>
         </div>
       </div>
     </section>
+  `;
+}
+
+function renderCoverMetaItem(label, value) {
+  if (!String(value || "").trim()) return "";
+
+  return `
+    <div class="cover-meta-item">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </div>
   `;
 }
 
@@ -572,90 +588,135 @@ function splitCoverTitle(title) {
     };
   }
 
-  const parts = clean.split(" ");
-  const midpoint = Math.ceil(parts.length / 2);
+  const words = clean.split(" ");
+  const half = Math.ceil(words.length / 2);
 
   return {
-    first: parts.slice(0, midpoint).join(" "),
-    second: parts.slice(midpoint).join(" ")
+    first: words.slice(0, half).join(" "),
+    second: words.slice(half).join(" ")
   };
 }
 
-function coverMeta(label, value) {
-  if (!String(value || "").trim()) return "";
+function renderFichaPage(meta, pageNumber) {
+  const scopeItems = [
+    "Ortografia, acentuação e pontuação",
+    "Gramática e concordância",
+    "Coerência e coesão textual",
+    "Estilo, clareza e adequação de linguagem",
+    "Padronização de elementos pré e pós-textuais",
+    "Citações, notas e referências",
+    "Tabelas, quadros, figuras e legendas",
+    "Numeração, títulos e hierarquia de tópicos"
+  ];
 
   return `
-    <div class="cover-meta-item">
-      <span>${escapeHtml(label)}</span>
-      <strong>${escapeHtml(value)}</strong>
-    </div>
-  `;
-}
+    <section class="a4-page">
+      ${renderTopArt()}
+      <div class="page-body">
+        <div class="page-title-row">
+          <span class="page-title-kicker">Ficha Editorial</span>
+          <h2 class="page-title">${escapeHtml(meta.tituloRelatorio || "Relatório de Revisão Editorial")}</h2>
+          <div class="page-title-rule"></div>
+        </div>
 
-function renderFicha(meta, pageNumber) {
-  const rows = [
-    ["Gênero literário", meta.generoLiterario],
-    ["Subgêneros e elementos", meta.subgenerosElementos],
-    ["Público-alvo", meta.publicoAlvo],
-    ["Identidade tonal", meta.identidadeTonal],
-    ["Promessa narrativa", meta.promessaNarrativa],
-    ["Conflito central", meta.conflitoCentral],
-    ["Estágio editorial", meta.estagioEditorial],
-    ["Nível de maturidade", meta.nivelMaturidade],
-    ["Maior força", meta.maiorForca],
-    ["Maior fraqueza", meta.maiorFraqueza],
-    ["Status", meta.statusDocumento],
-    ["Data", meta.data]
-  ].filter(([, value]) => String(value || "").trim());
+        <div class="page-scroll-area">
+          <div class="ficha-layout">
+            <div class="ficha-left">
+              <div class="ficha-intro">
+                ${renderMarkdown(meta.vereditoResumido || "Este relatório apresenta, de forma aprofundada e minuciosa, as intervenções realizadas no texto, com o objetivo de garantir excelência editorial em linguagem, estrutura, coerência, coesão, padronização e conformidade técnica.")}
+              </div>
 
-  return `
-    <section class="pdf-page">
-      ${renderDocHeader(meta, "Ficha Editorial", 1, meta.obra || "Documento Editorial")}
+              <div class="ficha-feature-grid">
+                ${renderFeature("Revisão completa", "Análise minuciosa dos elementos textuais, estruturais e narrativos do manuscrito.")}
+                ${renderFeature("Padronização", "Uniformização de estilo, formatação, hierarquia de tópicos e consistência documental.")}
+                ${renderFeature("Qualidade e fluidez", "Ajustes voltados para maior clareza, ritmo, legibilidade e impacto editorial.")}
+                ${renderFeature("Conformidade", "Adequação técnica do material segundo boas práticas de revisão e organização textual.")}
+              </div>
 
-      <main class="page-inner">
-        <div class="page-content-area">
-          ${meta.vereditoResumido ? `<div class="editorial-note">${renderMarkdown(meta.vereditoResumido)}</div>` : ""}
+              <div class="scope-box">
+                <h4>Escopo da revisão</h4>
+                <ul>
+                  ${scopeItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+                </ul>
+              </div>
 
-          <div class="ficha-grid">
-            ${rows.map(([label, value], index) => `
-              <article class="ficha-card ${shouldBeWide(label, value, index) ? "wide" : ""}">
-                <span>${escapeHtml(label)}</span>
-                <div class="content">${renderMarkdown(value)}</div>
-              </article>
-            `).join("")}
+              <div class="quote-box">
+                “Excelência editorial não é apenas corrigir palavras. É potencializar ideias.”
+              </div>
+            </div>
+
+            <div class="ficha-right">
+              <div class="meta-panel">
+                ${renderMetaRow("Documento base", meta.obra || "Não informado")}
+                ${renderMetaRow("Autor", meta.autor || "Não informado")}
+                ${renderMetaRow("Avaliador", meta.avaliador || "Não informado")}
+                ${renderMetaRow("Tipo de revisão", meta.tipoRevisao || "Não informado")}
+                ${renderMetaRow("Escopo", meta.escopo || "Não informado")}
+                ${renderMetaRow("Gênero literário", meta.generoLiterario || "Não informado")}
+                ${renderMetaRow("Público-alvo", meta.publicoAlvo || "Não informado")}
+                ${renderMetaRow("Identidade tonal", meta.identidadeTonal || "Não informado")}
+                ${renderMetaRow("Estágio editorial", meta.estagioEditorial || "Não informado")}
+                ${renderMetaRow("Status do documento", `<span class="meta-status">${escapeHtml(meta.statusDocumento || "Em elaboração")}</span>`, true)}
+              </div>
+            </div>
           </div>
         </div>
 
-        ${renderFooter(meta, pageNumber)}
-      </main>
+        ${renderFooter(pageNumber)}
+      </div>
     </section>
   `;
 }
 
-function shouldBeWide(label, value, index) {
-  const wideLabels = ["Promessa narrativa", "Conflito central", "Subgêneros e elementos", "Maior força", "Maior fraqueza"];
-  return wideLabels.includes(label) || String(value || "").length > 170 || index > 7;
+function renderFeature(title, text) {
+  return `
+    <div class="ficha-feature">
+      <h4>${escapeHtml(title)}</h4>
+      <p>${escapeHtml(text)}</p>
+    </div>
+  `;
 }
 
-function paginateCategory(category, startPageNumber, categoryNumber) {
+function renderMetaRow(label, value, isHtml = false) {
+  return `
+    <div class="meta-row">
+      <div class="meta-label">${escapeHtml(label)}</div>
+      <div class="meta-value">${isHtml ? value : escapeHtml(value)}</div>
+    </div>
+  `;
+}
+
+function paginateCategory(category, startPageNumber, categoryIndex) {
   const blocks = markdownToBlocks(category.content || "");
   const pages = [];
-  let currentBlocks = [];
-  let currentPageNumber = startPageNumber;
-  let currentPart = 1;
 
   if (!blocks.length) {
-    pages.push(renderCategoryPage(category, "", currentPageNumber, currentPart, 1, categoryNumber));
-    return { htmlPages: pages, count: 1 };
+    pages.push(renderCategoryPage({
+      category,
+      categoryIndex,
+      pageNumber: startPageNumber,
+      partNumber: 1,
+      totalParts: 1,
+      htmlContent: ""
+    }));
+
+    return { pages, count: 1 };
   }
+
+  let currentBlocks = [];
+  let pageNumber = startPageNumber;
 
   blocks.forEach((block) => {
     const candidate = [...currentBlocks, block];
 
-    if (currentBlocks.length && !fitsCategoryPage(category, candidate, currentPart, categoryNumber)) {
-      pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0, categoryNumber));
-      currentPageNumber += 1;
-      currentPart += 1;
+    if (currentBlocks.length && !fitsCategoryPage(category, categoryIndex, candidate.join(""), currentBlocks.length === 0 ? 1 : 999)) {
+      currentBlocks.push("__PAGE_BREAK__");
+    }
+
+    if (currentBlocks.includes("__PAGE_BREAK__")) {
+      currentBlocks.pop();
+
+      pages.push(currentBlocks.join(""));
       currentBlocks = [block];
     } else {
       currentBlocks = candidate;
@@ -663,30 +724,39 @@ function paginateCategory(category, startPageNumber, categoryNumber) {
   });
 
   if (currentBlocks.length) {
-    pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0, categoryNumber));
+    pages.push(currentBlocks.join(""));
   }
 
   const totalParts = pages.length;
 
-  const finalPages = pages.map((pageHtml, index) => {
-    return pageHtml
-      .replaceAll("__TOTAL_PARTS__", String(totalParts))
-      .replaceAll("__PART_NUMBER__", String(index + 1));
+  const htmlPages = pages.map((htmlContent, index) => {
+    return renderCategoryPage({
+      category,
+      categoryIndex,
+      pageNumber: pageNumber + index,
+      partNumber: index + 1,
+      totalParts,
+      htmlContent
+    });
   });
 
-  return {
-    htmlPages: finalPages,
-    count: finalPages.length
-  };
+  return { pages: htmlPages, count: htmlPages.length };
 }
 
-function fitsCategoryPage(category, blocks, partNumber, categoryNumber) {
-  const measure = getMeasureZone();
+function fitsCategoryPage(category, categoryIndex, htmlContent) {
+  const zone = getMeasureZone();
 
-  measure.innerHTML = renderCategoryPage(category, blocks.join(""), 999, partNumber, 1, categoryNumber, true);
+  zone.innerHTML = renderCategoryPage({
+    category,
+    categoryIndex,
+    pageNumber: 999,
+    partNumber: 1,
+    totalParts: 1,
+    htmlContent,
+    isMeasure: true
+  });
 
-  const area = measure.querySelector(".page-content-area");
-
+  const area = zone.querySelector(".page-scroll-area");
   if (!area) return true;
 
   return area.scrollHeight <= area.clientHeight;
@@ -705,84 +775,255 @@ function getMeasureZone() {
   return zone;
 }
 
-function renderCategoryPage(category, contentHtml, pageNumber, partNumber, totalParts, categoryNumber, isMeasure = false) {
+function renderCategoryPage({ category, categoryIndex, pageNumber, partNumber, totalParts, htmlContent, isMeasure = false }) {
+  const label = getCategoryLabel(category.type);
   const isContinuation = partNumber > 1;
-  const partLabel = totalParts && totalParts > 1 ? `Parte ${partNumber} de ${totalParts}` : "";
-  const title = isContinuation ? `${category.title} — continuação` : category.title;
-  const isFinal = category.type === "veredito";
+  const badge = totalParts > 1 ? `Parte ${partNumber} de ${totalParts}` : "";
+  const numberLabel = String(categoryIndex).padStart(2, "0");
+  const summary = category.summary ? renderMarkdown(category.summary) : "";
+  const observationText = getObservationText(category.type);
+
+  if ((category.type || "").toLowerCase() === "veredito" && totalParts === 1) {
+    return renderFinalCategoryPage({
+      category,
+      categoryIndex,
+      pageNumber,
+      htmlContent,
+      observationText
+    });
+  }
 
   return `
-    <section class="pdf-page">
-      ${renderDocHeader(appState.document.meta, category.type || "Categoria", categoryNumber, title)}
+    <section class="a4-page">
+      ${renderTopArt()}
 
-      <main class="page-inner">
-        <div class="page-content-area">
-          ${renderSectionHeading(category.type || "Categoria", title, categoryNumber)}
-
-          ${partLabel && !isMeasure ? `<div class="continuation-label">${escapeHtml(partLabel)}</div>` : ""}
-          ${category.summary && !isContinuation ? `<div class="editorial-note">${renderMarkdown(category.summary)}</div>` : ""}
-
-          ${
-            isFinal
-              ? `<div class="final-card"><h3>Veredito Editorial</h3><div class="content">${contentHtml}</div></div>`
-              : `<div class="section-box"><div class="content">${contentHtml}</div></div>`
-          }
+      <div class="page-body">
+        <div class="page-title-row">
+          <span class="page-title-kicker">${escapeHtml(label)}</span>
+          <h2 class="page-title">${escapeHtml(category.title || "Categoria")}</h2>
+          <div class="page-title-rule"></div>
         </div>
 
-        ${renderFooter(appState.document.meta, pageNumber)}
-      </main>
+        <div class="page-scroll-area">
+          <div class="section-head">
+            <div class="section-head-number">${numberLabel}</div>
+
+            <div class="section-head-text">
+              <span>${escapeHtml(label)}</span>
+              <h3>${escapeHtml(category.title || "Categoria")}</h3>
+            </div>
+          </div>
+
+          ${badge && !isMeasure ? `<div class="continuation-badge">${escapeHtml(badge)}</div>` : ""}
+          ${summary && !isContinuation ? `<div class="section-summary">${summary}</div>` : ""}
+
+          <div class="content-box">
+            <div class="content-render">${htmlContent}</div>
+          </div>
+
+          ${observationText && !isMeasure ? `
+            <div class="observation-box">
+              <div class="observation-title">Observações importantes</div>
+              <div class="observation-content">${escapeHtml(observationText)}</div>
+            </div>
+          ` : ""}
+        </div>
+
+        ${renderFooter(pageNumber)}
+      </div>
     </section>
   `;
 }
 
-function renderDocHeader(meta, label, number, title) {
+function renderFinalCategoryPage({ category, categoryIndex, pageNumber, htmlContent }) {
   return `
-    <header class="doc-header">
-      <img class="doc-header-logo" src="./assets/logo.png" alt="Logo" />
+    <section class="a4-page">
+      ${renderTopArt()}
 
-      <div class="doc-header-title">
-        <span>${escapeHtml(label || "Relatório Editorial")}</span>
-        <strong><span class="doc-number">${escapeHtml(String(number || ""))}.</span>${escapeHtml(title || meta.obra || "Revisão Editorial")}</strong>
-        <div class="doc-header-rule"></div>
+      <div class="page-body">
+        <div class="page-title-row">
+          <span class="page-title-kicker">Conclusão</span>
+          <h2 class="page-title">${escapeHtml(category.title || "Veredito Editorial Final")}</h2>
+          <div class="page-title-rule"></div>
+        </div>
+
+        <div class="page-scroll-area">
+          <div class="final-layout">
+            <div class="final-intro">
+              A revisão editorial deste documento foi concluída com sucesso. Todas as intervenções foram
+              realizadas com rigor técnico e sensibilidade editorial, assegurando uma análise profunda dos
+              aspectos de estrutura, linguagem, coerência, estilo, padronização e conformidade técnica.
+            </div>
+
+            <div class="final-result-box">
+              <h4>Resultado da revisão</h4>
+
+              <ul>
+                <li>Texto revisado com rigor e profundidade.</li>
+                <li>Linguagem aprimorada para maior clareza e fluidez.</li>
+                <li>Estrutura fortalecida e inconsistências identificadas com precisão.</li>
+                <li>Conformidade técnica e padronização asseguradas.</li>
+                <li>Documento preparado para as próximas etapas editoriais.</li>
+              </ul>
+            </div>
+
+            <div class="final-quote">
+              “Revisar é lapidar a essência do texto para que ele revele toda a sua força.”
+            </div>
+
+            <div class="content-box">
+              <div class="content-render">${htmlContent}</div>
+            </div>
+
+            <div class="final-signatures">
+              <div class="signature-box">
+                <div class="signature-name">${escapeHtml(appState.document.meta.avaliador || "Avaliador")}</div>
+                <div class="signature-role">Responsável pela revisão</div>
+              </div>
+
+              <div class="signature-box">
+                <div class="signature-name">Administração do Projeto</div>
+                <div class="signature-role">Grupo de gestão e estratégia</div>
+              </div>
+            </div>
+
+            <div class="final-bottom-banner">
+              <strong>Agradecemos a confiança!</strong>
+              <span>
+                Foi um privilégio contribuir para a construção de um texto ainda mais sólido, claro e impactante.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        ${renderFooter(pageNumber)}
       </div>
-
-      <div class="doc-header-mark"></div>
-    </header>
+    </section>
   `;
 }
 
-function renderSectionHeading(kicker, title, number) {
-  return `
-    <div class="section-heading">
-      <div class="section-icon">${escapeHtml(String(number || ""))}</div>
+function renderClosingPage(meta, pageNumber) {
+  const content = `
+    <h2>Veredito final</h2>
+    <p>${escapeHtml(meta.vereditoResumido || "Documento concluído.")}</p>
+    ${meta.observacoesGerais ? `<h3>Observações gerais</h3><p>${escapeHtml(meta.observacoesGerais)}</p>` : ""}
+  `;
 
-      <div class="section-heading-text">
-        <span>${escapeHtml(kicker)}</span>
-        <h2>${escapeHtml(title)}</h2>
-        <div class="section-rule"></div>
+  return `
+    <section class="a4-page">
+      ${renderTopArt()}
+
+      <div class="page-body">
+        <div class="page-title-row">
+          <span class="page-title-kicker">Conclusão</span>
+          <h2 class="page-title">Encerramento</h2>
+          <div class="page-title-rule"></div>
+        </div>
+
+        <div class="page-scroll-area">
+          <div class="final-layout">
+            <div class="final-intro">
+              Este relatório foi estruturado para oferecer uma visão técnica, crítica e aprofundada do material avaliado.
+            </div>
+
+            <div class="final-result-box">
+              <h4>Resultado da revisão</h4>
+              <ul>
+                <li>Mapeamento técnico do manuscrito realizado.</li>
+                <li>Pontos fortes e fragilidades identificados com clareza.</li>
+                <li>Encaminhamento editorial formulado com objetividade.</li>
+                <li>Base sólida para reescrita, lapidação e amadurecimento da obra.</li>
+              </ul>
+            </div>
+
+            <div class="content-box">
+              <div class="content-render">${content}</div>
+            </div>
+
+            <div class="final-bottom-banner">
+              <strong>Administração do Projeto</strong>
+              <span>Grupo de gestão e estratégia</span>
+            </div>
+          </div>
+        </div>
+
+        ${renderFooter(pageNumber)}
       </div>
+    </section>
+  `;
+}
+
+function renderTopArt() {
+  return `
+    <div class="page-top-art">
+      <img src="./assets/ornamento-topo.png" alt="Ornamento superior" />
     </div>
   `;
 }
 
-function renderFooter(meta, pageNumber) {
+function renderFooter(pageNumber) {
   return `
-    <footer class="doc-footer">
-      <div class="doc-footer-brand">
-        <img class="doc-footer-logo" src="./assets/logo.png" alt="Logo" />
+    <footer class="page-footer">
+      <div class="page-footer-left">
+        <img class="page-footer-logo" src="./assets/logo.png" alt="Logo" />
 
-        <div class="doc-footer-title">
+        <div class="page-footer-text">
           <strong>Administração do Projeto</strong>
           <span>Grupo de Gestão e Estratégia</span>
         </div>
       </div>
 
-      <div class="doc-footer-page">
+      <div class="page-footer-page">
         Página ${String(pageNumber).padStart(2, "0")}
       </div>
     </footer>
   `;
 }
+
+function getCategoryLabel(type = "") {
+  const map = {
+    diagnostico: "Diagnóstico editorial",
+    estrutura: "Estrutura narrativa",
+    ritmo: "Ritmo narrativo",
+    cenas: "Engenharia de cenas",
+    personagens: "Desenvolvimento de personagens",
+    dialogos: "Análise de diálogos",
+    prosa: "Prosa e estilo",
+    mundo: "Worldbuilding",
+    tema: "Tema e simbolismo",
+    gramatica: "Revisão técnica",
+    reescrita: "Sugestões de reescrita",
+    pontos_fortes: "Pontos fortes",
+    pontos_fracos: "Pontos de atenção",
+    prioridades: "Prioridades de reescrita",
+    plano_de_melhoria: "Plano de melhoria",
+    mercado: "Potencial de mercado",
+    sensibilidade: "Sensibilidade e representação",
+    veredito: "Veredito editorial",
+    lista: "Listagem técnica",
+    tabela: "Quadro analítico",
+    texto: "Análise editorial",
+    outro: "Análise complementar"
+  };
+
+  return map[(type || "").toLowerCase()] || "Análise editorial";
+}
+
+function getObservationText(type = "") {
+  const map = {
+    diagnostico: "Esta seção apresenta o diagnóstico geral do material e orienta a leitura estratégica das próximas análises.",
+    estrutura: "Os apontamentos estruturais devem ser observados em conjunto com ritmo, progressão e engenharia de cenas.",
+    ritmo: "Esta seção examina velocidade, pausas, distribuição de acontecimentos e fluidez da experiência de leitura.",
+    personagens: "A construção de personagens deve ser avaliada em relação à função narrativa, consistência emocional e individualidade.",
+    dialogos: "O foco aqui está na naturalidade, voz própria, subtexto e função dramática dos diálogos.",
+    gramatica: "Os apontamentos técnicos devem ser interpretados como base de refinamento, não como totalidade da revisão.",
+    veredito: "Esta seção consolida o parecer editorial final e aponta o estágio atual de maturidade do manuscrito."
+  };
+
+  return map[(type || "").toLowerCase()] || "";
+}
+
+/* ---------- PDF ---------- */
 
 async function generatePdf() {
   syncAllEditors();
@@ -790,7 +1031,7 @@ async function generatePdf() {
 
   const status = document.getElementById("pdfStatus");
   const button = document.getElementById("generatePdfBtn");
-  const pages = [...document.querySelectorAll("#documentPreview .pdf-page")];
+  const pages = [...document.querySelectorAll("#documentPreview .a4-page")];
 
   if (!pages.length) {
     showToast("Não há páginas para gerar.");
@@ -819,7 +1060,6 @@ async function generatePdf() {
       const imgData = canvas.toDataURL("image/jpeg", 0.98);
 
       if (index > 0) pdf.addPage();
-
       pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
     }
 
@@ -838,14 +1078,16 @@ async function generatePdf() {
 function waitForAllImages(root) {
   const images = [...root.querySelectorAll("img")];
 
-  return Promise.all(images.map((img) => {
-    if (img.complete) return Promise.resolve();
+  return Promise.all(
+    images.map((img) => {
+      if (img.complete) return Promise.resolve();
 
-    return new Promise((resolve) => {
-      img.onload = resolve;
-      img.onerror = resolve;
-    });
-  }));
+      return new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    })
+  );
 }
 
 function createPdfFileName(name) {
@@ -859,13 +1101,16 @@ function createPdfFileName(name) {
   return `revisao-editorial-${slug || "documento"}.pdf`;
 }
 
+/* ---------- MARKDOWN ---------- */
+
 function markdownToBlocks(text) {
   if (!String(text || "").trim()) return [];
 
   const lines = String(text).replace(/\r\n/g, "\n").split("\n");
   const blocks = [];
+
   let paragraph = [];
-  let list = [];
+  let unordered = [];
   let ordered = [];
   let quote = [];
   let table = [];
@@ -877,10 +1122,10 @@ function markdownToBlocks(text) {
     }
   };
 
-  const flushList = () => {
-    if (list.length) {
-      blocks.push(`<ul>${list.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`);
-      list = [];
+  const flushLists = () => {
+    if (unordered.length) {
+      blocks.push(`<ul>${unordered.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`);
+      unordered = [];
     }
 
     if (ordered.length) {
@@ -908,7 +1153,7 @@ function markdownToBlocks(text) {
 
     if (!line) {
       flushParagraph();
-      flushList();
+      flushLists();
       flushQuote();
       flushTable();
       return;
@@ -916,7 +1161,7 @@ function markdownToBlocks(text) {
 
     if (line.startsWith("|") && line.endsWith("|")) {
       flushParagraph();
-      flushList();
+      flushLists();
       flushQuote();
       table.push(line);
       return;
@@ -926,7 +1171,7 @@ function markdownToBlocks(text) {
 
     if (line.startsWith("### ")) {
       flushParagraph();
-      flushList();
+      flushLists();
       flushQuote();
       blocks.push(`<h3>${inlineMarkdown(line.replace(/^###\s+/, ""))}</h3>`);
       return;
@@ -934,7 +1179,7 @@ function markdownToBlocks(text) {
 
     if (line.startsWith("## ")) {
       flushParagraph();
-      flushList();
+      flushLists();
       flushQuote();
       blocks.push(`<h2>${inlineMarkdown(line.replace(/^##\s+/, ""))}</h2>`);
       return;
@@ -942,7 +1187,7 @@ function markdownToBlocks(text) {
 
     if (line.startsWith("# ")) {
       flushParagraph();
-      flushList();
+      flushLists();
       flushQuote();
       blocks.push(`<h1>${inlineMarkdown(line.replace(/^#\s+/, ""))}</h1>`);
       return;
@@ -950,7 +1195,7 @@ function markdownToBlocks(text) {
 
     if (line.startsWith(">")) {
       flushParagraph();
-      flushList();
+      flushLists();
       quote.push(line.replace(/^>\s?/, ""));
       return;
     }
@@ -958,7 +1203,7 @@ function markdownToBlocks(text) {
     if (/^[-*]\s+/.test(line)) {
       flushParagraph();
       flushQuote();
-      list.push(line.replace(/^[-*]\s+/, ""));
+      unordered.push(line.replace(/^[-*]\s+/, ""));
       return;
     }
 
@@ -973,7 +1218,7 @@ function markdownToBlocks(text) {
   });
 
   flushParagraph();
-  flushList();
+  flushLists();
   flushQuote();
   flushTable();
 
@@ -991,13 +1236,13 @@ function tableToHtml(lines) {
 
   if (!rows.length) return "";
 
-  const head = rows[0];
+  const header = rows[0];
   const body = rows.slice(1);
 
   return `
     <table>
       <thead>
-        <tr>${head.map((cell) => `<th>${inlineMarkdown(cell)}</th>`).join("")}</tr>
+        <tr>${header.map((cell) => `<th>${inlineMarkdown(cell)}</th>`).join("")}</tr>
       </thead>
       <tbody>
         ${body.map((row) => `<tr>${row.map((cell) => `<td>${inlineMarkdown(cell)}</td>`).join("")}</tr>`).join("")}
@@ -1014,24 +1259,10 @@ function inlineMarkdown(text) {
   return html;
 }
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text)
-    .then(() => showToast("Prompt copiado."))
-    .catch(() => showToast("Não foi possível copiar automaticamente."));
-}
+/* ---------- UTILITÁRIOS ---------- */
 
 function loadFromStorage() {
   const saved = localStorage.getItem(STORAGE_KEY);
-
   if (!saved) return;
 
   try {
@@ -1042,18 +1273,34 @@ function loadFromStorage() {
   }
 }
 
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text)
+    .then(() => showToast("Prompt copiado."))
+    .catch(() => showToast("Não foi possível copiar automaticamente."));
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function showToast(message) {
   const toast = document.getElementById("toast");
-
   toast.textContent = message;
   toast.classList.add("show");
 
-  clearTimeout(showToast.timeout);
+  clearTimeout(showToast._timer);
 
-  showToast.timeout = setTimeout(() => {
+  showToast._timer = setTimeout(() => {
     toast.classList.remove("show");
   }, 2600);
 }
+
+/* ---------- EXEMPLO ---------- */
 
 function getExampleText() {
   return `[TITULO_RELATORIO]
@@ -1063,10 +1310,10 @@ Relatório de Revisão Editorial
 Revisão editorial extremamente detalhada
 
 [OBRA]
-Sancta Corrupta
+O Amado da Luzz
 
 [AUTOR]
-Mayke Arrais
+Não informado
 
 [AVALIADOR]
 Administração do Projeto
@@ -1107,7 +1354,7 @@ Intermediário promissor.
 Rascunho intermediário com estrutura já desenhada.
 
 [MAIOR_FORCA]
-Vocação épica combinada com reconstrução emocional.
+Vocação épica combinada com reconstrução emocional por meio dos vínculos.
 
 [MAIOR_FRAQUEZA]
 Excesso de intensidade sem variação suficiente.
@@ -1146,7 +1393,7 @@ A força literária do texto aparece principalmente na energia da jornada. O lei
 - Excesso de exposição direta.
 - Necessidade de mais cenas vividas pelo leitor.
 
-A clareza narrativa é razoável. O leitor consegue acompanhar o objetivo principal, mas a quantidade de nomes, raças, cidades, deuses, mestres, relíquias, demônios, locais e sistemas mágicos pode criar sobrecarga. A revisão deve preservar a ambição, mas controlar melhor a entrada de informações.
+A clareza narrativa é razoável. O leitor consegue acompanhar o objetivo principal, mas a quantidade de nomes, raças, cidades, deuses, mestres, relíquias, demônios, locais e sistemas mágicos pode criar sobrecarga.
 
 [FIM_CATEGORIA]
 

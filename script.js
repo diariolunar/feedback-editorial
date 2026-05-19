@@ -836,14 +836,13 @@ function renderCategoryPage(category, contentHtml, pageNumber, partNumber, total
 function renderPageHeader(kicker, title) {
   return `
     <header class="page-head">
-      <img class="page-head-logo" src="./assets/logo.png" alt="Logo" />
-      <img class="page-head-ornament" src="./assets/ornamento-topo.png" alt="" />
-
-      <div class="page-head-title">
-        <span>${escapeHtml(kicker)}</span>
-        <h2>${escapeHtml(title)}</h2>
-      </div>
+      <img class="page-head-full" src="./assets/ornamento-topo.png" alt="Cabeçalho do documento" />
     </header>
+
+    <section class="section-title-block">
+      <span>${escapeHtml(kicker)}</span>
+      <h2>${escapeHtml(title)}</h2>
+    </section>
   `;
 }
 

@@ -1,4 +1,4 @@
-const STORAGE_KEY = "feedback_editorial_documento_v1";
+const STORAGE_KEY = "feedback_editorial_documento_v3";
 
 const appState = {
   selectedCategoryIndex: -1,
@@ -60,8 +60,6 @@ Você NÃO deve retirar informações importantes.
 Você NÃO deve inventar informações ausentes.
 Você NÃO deve transformar o texto em artigo, ensaio ou parecer novo.
 Você deve apenas organizar, padronizar, classificar e preparar o conteúdo para diagramação.
-
-O objetivo é que o texto final possa ser colado em uma plataforma web que reconhece campos e categorias automaticamente.
 
 REGRAS GERAIS:
 1. Preserve TODO o conteúdo relevante da revisão original.
@@ -183,25 +181,7 @@ CATEGORIAS ESPERADAS:
 Sempre que existirem no texto original, separe em categorias próprias os seguintes blocos:
 Antes da análise completa; Gênero literário aparente; Público-alvo provável; Identidade tonal; Promessa narrativa; Conflito central; Nível atual de maturidade do manuscrito; Maior força; Maior fraqueza; Diagnóstico editorial geral; Premissa e promessa narrativa; Estrutura narrativa; Ritmo narrativo; Engenharia de cenas; Desenvolvimento de personagens; Análise do protagonista; Forças antagônicas; Relações entre personagens; Diálogos; Voz narrativa; Ponto de vista; Prosa e estilo; Clareza; Mostrar versus contar; Subtexto; Construção emocional; Tensão narrativa; Consistência interna; Construção de mundo; Atmosfera e ambientação; Tema e simbolismo; Originalidade; Gramática e revisão técnica; Edição linha a linha; Experiência do leitor; Potencial de mercado; Sensibilidade e representação; Pontos fortes; Pontos fracos; Prioridades de reescrita; Plano prático de melhoria; Sugestões concretas de reescrita; Veredito editorial final.
 
-Caso alguma dessas categorias não exista no texto original, não invente. Apenas organize as que existirem.
-
-REGRAS PARA TABELAS:
-Quando houver tabelas, preserve em Markdown.
-
-REGRAS PARA TRECHOS DE REESCRITA:
-Quando houver blocos de reescrita, preserve a estrutura:
-### Trecho
-### Original Passage
-### Problem
-### Suggested Revision
-### Why This Improves the Passage
-
-Ou, se estiver em português:
-### Trecho
-### Passagem Original
-### Problema
-### Sugestão de Reescrita
-### Por que melhora
+Não invente categorias ausentes.
 
 SAÍDA FINAL:
 Entregue apenas o documento padronizado.
@@ -249,7 +229,7 @@ REGRAS DE CONDENSAÇÃO:
 8. Não suavize o parecer.
 9. Não transforme uma obra imatura em obra pronta.
 10. Não remova críticas estruturais importantes.
-11. Mantenha um tom profissional, firme, respeitoso e editorialmente útil.
+11. Mantenha tom profissional, firme, respeitoso e editorialmente útil.
 
 TAMANHO:
 A versão resumida deve ter aproximadamente entre 20% e 35% do tamanho do relatório original.
@@ -327,35 +307,17 @@ Cada categoria deve seguir exatamente este modelo:
 Nome da categoria
 
 [TIPO_CATEGORIA]
-Use um dos tipos abaixo:
-diagnostico
-estrutura
-ritmo
-personagens
-dialogos
-prosa
-mundo
-tema
-gramatica
-pontos_fortes
-pontos_fracos
-prioridades
-plano_de_melhoria
-reescrita
-mercado
-sensibilidade
-veredito
-outro
+Use um tipo adequado.
 
 [RESUMO_CATEGORIA]
-Escreva um resumo curto da categoria em 1 ou 2 frases.
+Resumo curto.
 
 [CONTEUDO]
 Conteúdo resumido da categoria.
 
 [FIM_CATEGORIA]
 
-CATEGORIAS OBRIGATÓRIAS DA VERSÃO RESUMIDA, NESTA ORDEM:
+CATEGORIAS OBRIGATÓRIAS:
 1. Diagnóstico Editorial Geral
 2. Gênero, Público e Tom
 3. Premissa e Promessa Narrativa
@@ -373,9 +335,6 @@ CATEGORIAS OBRIGATÓRIAS DA VERSÃO RESUMIDA, NESTA ORDEM:
 15. Sensibilidade e Representação
 16. Veredito Editorial Final
 
-Se alguma dessas categorias não tiver informação suficiente no texto original, escreva:
-Não informado.
-
 SAÍDA FINAL:
 Entregue apenas o documento padronizado.
 Não escreva introdução.
@@ -390,85 +349,53 @@ COLE AQUI O TEXTO COMPLETO DA REVISÃO EDITORIAL`;
 
 document.addEventListener("DOMContentLoaded", () => {
   setupTabs();
-  setupPromptButtons();
-  setupImportButtons();
-  setupEditorButtons();
-  setupPreviewButtons();
-  loadFromStorage(false);
+  setupButtons();
+  loadFromStorage();
   renderAll();
 });
 
 function setupTabs() {
-  document.querySelectorAll(".nav-tab").forEach((button) => {
-    button.addEventListener("click", () => {
-      activateTab(button.dataset.tab);
-    });
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    button.addEventListener("click", () => activateTab(button.dataset.tab));
   });
 }
 
-function activateTab(tabName) {
-  document.querySelectorAll(".nav-tab").forEach((button) => {
-    button.classList.toggle("active", button.dataset.tab === tabName);
-  });
-
-  document.querySelectorAll(".tab-panel").forEach((panel) => {
-    panel.classList.toggle("active", panel.id === `tab-${tabName}`);
-  });
-
-  if (tabName === "preview") {
-    syncMetaFromInputs();
-    renderPreview();
-  }
-}
-
-function setupPromptButtons() {
-  const fullButton = document.getElementById("copyFullPromptBtn");
-  const summaryButton = document.getElementById("copySummaryPromptBtn");
-
-  fullButton.addEventListener("click", () => {
-    copyToClipboard(PROMPT_COMPLETO);
-  });
-
-  summaryButton.addEventListener("click", () => {
-    copyToClipboard(PROMPT_RESUMIDO);
-  });
-}
-
-function setupImportButtons() {
-  document.getElementById("parseBtn").addEventListener("click", () => {
-    const rawText = document.getElementById("rawInput").value;
-
-    if (!rawText.trim()) {
-      showToast("Cole um texto padronizado antes de processar.");
-      return;
-    }
-
-    appState.document = parseStandardDocument(rawText);
-    appState.selectedCategoryIndex = appState.document.categories.length ? 0 : -1;
-    renderAll();
-    showToast("Texto processado com sucesso.");
-  });
-
-  document.getElementById("goEditBtn").addEventListener("click", () => {
-    activateTab("editar");
-  });
+function setupButtons() {
+  document.getElementById("copyFullPromptBtn").addEventListener("click", () => copyToClipboard(PROMPT_COMPLETO));
+  document.getElementById("copySummaryPromptBtn").addEventListener("click", () => copyToClipboard(PROMPT_RESUMIDO));
 
   document.getElementById("loadExampleBtn").addEventListener("click", () => {
     document.getElementById("rawInput").value = getExampleText();
     showToast("Exemplo carregado.");
   });
-}
 
-function setupEditorButtons() {
+  document.getElementById("parseBtn").addEventListener("click", () => {
+    const text = document.getElementById("rawInput").value.trim();
+
+    if (!text) {
+      showToast("Cole o texto padronizado primeiro.");
+      return;
+    }
+
+    appState.document = parseStandardDocument(text);
+    appState.selectedCategoryIndex = appState.document.categories.length ? 0 : -1;
+    renderAll();
+    activateTab("editar");
+    showToast("Texto processado com sucesso.");
+  });
+
+  document.getElementById("goEditBtn").addEventListener("click", () => activateTab("editar"));
+
   Object.entries(META_INPUTS).forEach(([key, inputId]) => {
-    const input = document.getElementById(inputId);
-    input.addEventListener("input", () => {
-      appState.document.meta[key] = input.value;
+    document.getElementById(inputId).addEventListener("input", (event) => {
+      appState.document.meta[key] = event.target.value;
     });
   });
 
   document.getElementById("applyCategoryBtn").addEventListener("click", () => {
     applyCategoryEditor();
+    renderAll();
+    showToast("Categoria atualizada.");
   });
 
   document.getElementById("addCategoryBtn").addEventListener("click", () => {
@@ -485,151 +412,125 @@ function setupEditorButtons() {
   });
 
   document.getElementById("removeCategoryBtn").addEventListener("click", () => {
-    const index = appState.selectedCategoryIndex;
-
-    if (index < 0) {
+    if (appState.selectedCategoryIndex < 0) {
       showToast("Nenhuma categoria selecionada.");
       return;
     }
 
-    const confirmed = window.confirm("Tem certeza que deseja remover esta categoria?");
+    if (!window.confirm("Remover esta categoria?")) return;
 
-    if (!confirmed) {
-      return;
-    }
-
-    appState.document.categories.splice(index, 1);
+    appState.document.categories.splice(appState.selectedCategoryIndex, 1);
     appState.selectedCategoryIndex = appState.document.categories.length ? 0 : -1;
     renderAll();
     showToast("Categoria removida.");
   });
 
   document.getElementById("saveBtn").addEventListener("click", () => {
-    syncMetaFromInputs();
-    applyCategoryEditor(false);
-    saveToStorage();
+    syncAllEditors();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState.document));
+    showToast("Documento salvo no navegador.");
   });
 
   document.getElementById("clearBtn").addEventListener("click", () => {
-    const confirmed = window.confirm("Tem certeza que deseja limpar tudo?");
-
-    if (!confirmed) {
-      return;
-    }
+    if (!window.confirm("Limpar tudo?")) return;
 
     localStorage.removeItem(STORAGE_KEY);
+    appState.document = { meta: {}, categories: [] };
     appState.selectedCategoryIndex = -1;
-    appState.document = {
-      meta: {},
-      categories: []
-    };
-
     document.getElementById("rawInput").value = "";
     renderAll();
-    showToast("Tudo foi limpo.");
+    showToast("Tudo limpo.");
   });
-}
 
-function setupPreviewButtons() {
   document.getElementById("refreshPreviewBtn").addEventListener("click", () => {
-    syncMetaFromInputs();
-    applyCategoryEditor(false);
+    syncAllEditors();
     renderPreview();
     showToast("Prévia atualizada.");
   });
 
-  document.getElementById("printBtn").addEventListener("click", () => {
-    syncMetaFromInputs();
-    applyCategoryEditor(false);
-    renderPreview();
+  document.getElementById("generatePdfBtn").addEventListener("click", generatePdf);
+}
 
-    setTimeout(() => {
-      window.print();
-    }, 150);
+function activateTab(tabName) {
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    button.classList.toggle("active", button.dataset.tab === tabName);
   });
+
+  document.querySelectorAll(".tab-panel").forEach((panel) => {
+    panel.classList.toggle("active", panel.id === `tab-${tabName}`);
+  });
+
+  if (tabName === "preview") {
+    syncAllEditors();
+    renderPreview();
+  }
 }
 
 function parseStandardDocument(text) {
-  const normalizedText = String(text || "").replace(/\r\n/g, "\n");
-  const categories = parseCategories(normalizedText);
-  const metaText = normalizedText.split("[CATEGORIA]")[0] || normalizedText;
-  const meta = parseMetaFields(metaText);
+  const normalized = text.replace(/\r\n/g, "\n");
+  const metaPart = normalized.split("[CATEGORIA]")[0] || "";
+  const categories = parseCategories(normalized);
 
   return {
-    meta,
+    meta: parseMeta(metaPart),
     categories
   };
 }
 
-function parseMetaFields(text) {
+function parseMeta(text) {
   const meta = {};
-  const markerRegex = /^\[([A-Z0-9_]+)\]\s*$/gm;
-  const matches = [...text.matchAll(markerRegex)];
+  const regex = /^\[([A-Z0-9_]+)\]\s*$/gm;
+  const matches = [...text.matchAll(regex)];
 
   matches.forEach((match, index) => {
     const marker = match[1];
-    const fieldKey = FIELD_MAP[marker];
+    const key = FIELD_MAP[marker];
 
-    if (!fieldKey) {
-      return;
-    }
+    if (!key) return;
 
-    const valueStart = match.index + match[0].length;
-    const valueEnd = index + 1 < matches.length ? matches[index + 1].index : text.length;
-    const value = text.slice(valueStart, valueEnd).trim();
+    const start = match.index + match[0].length;
+    const end = index + 1 < matches.length ? matches[index + 1].index : text.length;
 
-    meta[fieldKey] = value;
+    meta[key] = text.slice(start, end).trim();
   });
 
   return meta;
 }
 
 function parseCategories(text) {
-  const parts = text.split("[CATEGORIA]").slice(1);
+  const blocks = text.split("[CATEGORIA]").slice(1);
 
-  return parts
-    .map((part) => {
-      const cleanPart = part.split("[FIM_CATEGORIA]")[0] || part;
-
-      const title = readSectionValue(cleanPart, null, "[TIPO_CATEGORIA]").trim();
-      const type = readSectionValue(cleanPart, "[TIPO_CATEGORIA]", "[RESUMO_CATEGORIA]").trim() || "texto";
-      const summary = readSectionValue(cleanPart, "[RESUMO_CATEGORIA]", "[CONTEUDO]").trim();
-      const content = readSectionValue(cleanPart, "[CONTEUDO]", null).trim();
+  return blocks
+    .map((block) => {
+      const clean = block.split("[FIM_CATEGORIA]")[0];
 
       return {
-        title: title || "Categoria sem título",
-        type,
-        summary,
-        content
+        title: readBetween(clean, null, "[TIPO_CATEGORIA]").trim() || "Categoria sem título",
+        type: readBetween(clean, "[TIPO_CATEGORIA]", "[RESUMO_CATEGORIA]").trim() || "texto",
+        summary: readBetween(clean, "[RESUMO_CATEGORIA]", "[CONTEUDO]").trim(),
+        content: readBetween(clean, "[CONTEUDO]", null).trim()
       };
     })
     .filter((category) => category.title || category.content);
 }
 
-function readSectionValue(text, startMarker, endMarker) {
-  let startIndex = 0;
+function readBetween(text, startMarker, endMarker) {
+  let start = 0;
 
   if (startMarker) {
     const foundStart = text.indexOf(startMarker);
-
-    if (foundStart === -1) {
-      return "";
-    }
-
-    startIndex = foundStart + startMarker.length;
+    if (foundStart === -1) return "";
+    start = foundStart + startMarker.length;
   }
 
-  let endIndex = text.length;
+  let end = text.length;
 
   if (endMarker) {
-    const foundEnd = text.indexOf(endMarker, startIndex);
-
-    if (foundEnd !== -1) {
-      endIndex = foundEnd;
-    }
+    const foundEnd = text.indexOf(endMarker, start);
+    if (foundEnd !== -1) end = foundEnd;
   }
 
-  return text.slice(startIndex, endIndex);
+  return text.slice(start, end);
 }
 
 function renderAll() {
@@ -640,22 +541,9 @@ function renderAll() {
 }
 
 function renderMetaInputs() {
-  Object.entries(META_INPUTS).forEach(([key, inputId]) => {
-    const input = document.getElementById(inputId);
-
-    if (input) {
-      input.value = appState.document.meta[key] || "";
-    }
-  });
-}
-
-function syncMetaFromInputs() {
-  Object.entries(META_INPUTS).forEach(([key, inputId]) => {
-    const input = document.getElementById(inputId);
-
-    if (input) {
-      appState.document.meta[key] = input.value;
-    }
+  Object.entries(META_INPUTS).forEach(([key, id]) => {
+    const input = document.getElementById(id);
+    input.value = appState.document.meta[key] || "";
   });
 }
 
@@ -664,18 +552,18 @@ function renderCategoryList() {
   const categories = appState.document.categories;
 
   if (!categories.length) {
-    container.innerHTML = `<div class="empty-state small">Nenhuma categoria carregada ainda.</div>`;
+    container.innerHTML = `<p class="side-empty">Nenhuma categoria carregada.</p>`;
     return;
   }
 
   container.innerHTML = categories
     .map((category, index) => {
-      const activeClass = index === appState.selectedCategoryIndex ? "active" : "";
+      const active = index === appState.selectedCategoryIndex ? "active" : "";
 
       return `
-        <button class="category-item ${activeClass}" data-index="${index}">
-          <span class="category-item-title">${escapeHtml(category.title)}</span>
-          <span class="category-item-type">${escapeHtml(category.type || "texto")}</span>
+        <button class="category-item ${active}" data-index="${index}">
+          <strong>${escapeHtml(category.title)}</strong>
+          <span>${escapeHtml(category.type || "texto")}</span>
         </button>
       `;
     })
@@ -693,8 +581,7 @@ function renderCategoryList() {
 }
 
 function renderCategoryEditor() {
-  const index = appState.selectedCategoryIndex;
-  const category = appState.document.categories[index];
+  const category = appState.document.categories[appState.selectedCategoryIndex];
 
   const titleDisplay = document.getElementById("selectedCategoryTitle");
   const typeDisplay = document.getElementById("selectedCategoryType");
@@ -713,7 +600,7 @@ function renderCategoryEditor() {
     return;
   }
 
-  titleDisplay.textContent = category.title || "Categoria sem título";
+  titleDisplay.textContent = category.title;
   typeDisplay.textContent = category.type || "texto";
   titleInput.value = category.title || "";
   typeInput.value = category.type || "texto";
@@ -722,233 +609,370 @@ function renderCategoryEditor() {
 }
 
 function applyCategoryEditor(showMessage = true) {
-  const index = appState.selectedCategoryIndex;
-  const category = appState.document.categories[index];
+  const category = appState.document.categories[appState.selectedCategoryIndex];
 
-  if (!category) {
-    return;
-  }
+  if (!category) return;
 
   category.title = document.getElementById("categoryTitleInput").value.trim() || "Categoria sem título";
   category.type = document.getElementById("categoryTypeInput").value || "texto";
   category.summary = document.getElementById("categorySummaryInput").value.trim();
   category.content = document.getElementById("categoryContentInput").value.trim();
 
-  renderCategoryList();
-  renderCategoryEditor();
-
   if (showMessage) {
     showToast("Alterações aplicadas.");
   }
 }
 
+function syncAllEditors() {
+  Object.entries(META_INPUTS).forEach(([key, id]) => {
+    appState.document.meta[key] = document.getElementById(id).value;
+  });
+
+  applyCategoryEditor(false);
+}
+
 function renderPreview() {
   const container = document.getElementById("documentPreview");
-  const { meta, categories } = appState.document;
 
-  if (!hasDocumentContent()) {
-    container.innerHTML = `<div class="empty-state">Nenhum documento carregado ainda.</div>`;
+  if (!hasContent()) {
+    container.innerHTML = `<article class="app-card">Nenhum documento carregado ainda.</article>`;
     return;
   }
 
+  const meta = appState.document.meta;
   const pages = [];
 
-  pages.push(renderCoverPage(meta));
-  pages.push(renderInitialDataPage(meta));
+  pages.push(renderCover(meta));
+  pages.push(renderFicha(meta, 2));
 
-  categories.forEach((category, index) => {
-    pages.push(renderCategoryPage(category, index + 1, categories.length, meta));
+  let pageNumber = 3;
+
+  appState.document.categories.forEach((category) => {
+    const categoryPages = paginateCategory(category, pageNumber);
+    pages.push(...categoryPages.htmlPages);
+    pageNumber += categoryPages.count;
   });
 
   container.innerHTML = pages.join("");
 }
 
-function hasDocumentContent() {
-  const metaHasContent = Object.values(appState.document.meta || {}).some((value) => String(value || "").trim());
-  const categoriesHaveContent = appState.document.categories.length > 0;
-
-  return metaHasContent || categoriesHaveContent;
+function hasContent() {
+  return Object.values(appState.document.meta || {}).some((value) => String(value || "").trim()) ||
+    appState.document.categories.length > 0;
 }
 
-function renderCoverPage(meta) {
-  const title = meta.tituloRelatorio || "Revisão Editorial";
-  const subtitle = meta.subtituloRelatorio || meta.tipoRevisao || "Relatório profissional";
-  const obra = meta.obra || "Obra não informada";
-
+function renderCover(meta) {
   return `
-    <article class="page dark">
-      <img class="page-ornament" src="./assets/ornamento-topo.png" alt="" />
-      <div class="page-inner">
-        <img class="page-logo" src="./assets/logo.png" alt="Logo" />
+    <section class="pdf-page dark">
+      <div class="page-border"></div>
 
-        <h1 class="cover-title">${escapeHtml(title)}</h1>
-        <p class="cover-subtitle">${escapeHtml(subtitle)}</p>
+      <div class="cover-content">
+        <img class="cover-logo" src="./assets/logo.png" alt="Logo" />
+        <img class="cover-ornament" src="./assets/ornamento-topo.png" alt="" />
 
-        <div class="cover-work">
+        <div class="cover-kicker">${escapeHtml(meta.tipoRevisao || "Revisão Editorial Profissional")}</div>
+
+        <h1 class="cover-title">${escapeHtml(meta.tituloRelatorio || "Relatório de Revisão Editorial")}</h1>
+
+        <p class="cover-subtitle">${escapeHtml(meta.subtituloRelatorio || "Documento editorial detalhado")}</p>
+
+        <div class="cover-work-box">
           <span>Obra analisada</span>
-          <strong>${escapeHtml(obra)}</strong>
+          <strong>${escapeHtml(meta.obra || "Obra não informada")}</strong>
         </div>
 
         <div class="cover-meta">
-          ${renderCoverMetaRow("Autor", meta.autor)}
-          ${renderCoverMetaRow("Avaliador", meta.avaliador)}
-          ${renderCoverMetaRow("Tipo", meta.tipoRevisao)}
-          ${renderCoverMetaRow("Escopo", meta.escopo)}
-          ${renderCoverMetaRow("Data", meta.data)}
+          ${coverMeta("Autor", meta.autor)}
+          ${coverMeta("Avaliador", meta.avaliador)}
+          ${coverMeta("Escopo", meta.escopo)}
+          ${coverMeta("Status", meta.statusDocumento)}
         </div>
       </div>
-    </article>
+    </section>
   `;
 }
 
-function renderCoverMetaRow(label, value) {
-  if (!String(value || "").trim()) {
-    return "";
-  }
+function coverMeta(label, value) {
+  if (!String(value || "").trim()) return "";
 
   return `
-    <div class="cover-meta-row">
-      <span class="cover-meta-label">${escapeHtml(label)}</span>
-      <span class="cover-meta-value">${escapeHtml(value)}</span>
+    <div class="cover-meta-item">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
     </div>
   `;
 }
 
-function renderInitialDataPage(meta) {
+function renderFicha(meta, pageNumber) {
   const rows = [
     ["Gênero literário", meta.generoLiterario],
     ["Subgêneros e elementos", meta.subgenerosElementos],
     ["Público-alvo", meta.publicoAlvo],
     ["Identidade tonal", meta.identidadeTonal],
+    ["Promessa narrativa", meta.promessaNarrativa],
+    ["Conflito central", meta.conflitoCentral],
     ["Estágio editorial", meta.estagioEditorial],
     ["Nível de maturidade", meta.nivelMaturidade],
     ["Maior força", meta.maiorForca],
     ["Maior fraqueza", meta.maiorFraqueza],
-    ["Status", meta.statusDocumento]
+    ["Status", meta.statusDocumento],
+    ["Data", meta.data]
   ].filter(([, value]) => String(value || "").trim());
 
-  const tableRows = rows
-    .map(([label, value]) => `
-      <tr>
-        <th>${escapeHtml(label)}</th>
-        <td>${renderMarkdown(value)}</td>
-      </tr>
-    `)
-    .join("");
-
   return `
-    <article class="page">
-      <img class="page-ornament" src="./assets/ornamento-topo.png" alt="" />
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-kicker">Ficha editorial</span>
-          <h2 class="page-title">${escapeHtml(meta.obra || "Documento editorial")}</h2>
-        </header>
+    <section class="pdf-page">
+      ${renderPageHeader("Ficha Editorial", meta.obra || "Documento Editorial")}
+      <main class="page-body">
+        <div class="pdf-content-area">
+          ${meta.vereditoResumido ? `<div class="section-summary">${renderMarkdown(meta.vereditoResumido)}</div>` : ""}
 
-        <div class="content-block">
-          ${meta.vereditoResumido ? `<blockquote>${renderMarkdown(meta.vereditoResumido)}</blockquote>` : ""}
-
-          <table>
-            <tbody>
-              ${tableRows || `<tr><td>Dados principais não informados.</td></tr>`}
-            </tbody>
-          </table>
-
-          ${meta.promessaNarrativa ? `<h2>Promessa narrativa</h2>${renderMarkdown(meta.promessaNarrativa)}` : ""}
-          ${meta.conflitoCentral ? `<h2>Conflito central</h2>${renderMarkdown(meta.conflitoCentral)}` : ""}
-          ${meta.observacoesGerais ? `<h2>Observações gerais</h2>${renderMarkdown(meta.observacoesGerais)}` : ""}
+          <div class="info-grid">
+            ${rows.map(([label, value]) => `
+              <div class="info-row">
+                <div class="info-label">${escapeHtml(label)}</div>
+                <div class="info-value content">${renderMarkdown(value)}</div>
+              </div>
+            `).join("")}
+          </div>
         </div>
 
-        ${renderFooter(meta, 1)}
-      </div>
-    </article>
+        ${renderFooter(meta, pageNumber)}
+      </main>
+    </section>
   `;
 }
 
-function renderCategoryPage(category, pageIndex, totalCategories, meta) {
-  const title = category.title || "Categoria sem título";
-  const type = category.type || "texto";
-  const summary = category.summary || "";
-  const content = category.content || "";
+function paginateCategory(category, startPageNumber) {
+  const blocks = markdownToBlocks(category.content || "");
+  const pages = [];
+  let currentBlocks = [];
+  let currentPageNumber = startPageNumber;
+  let currentPart = 1;
+
+  if (!blocks.length) {
+    pages.push(renderCategoryPage(category, "", currentPageNumber, currentPart, 1));
+    return { htmlPages: pages, count: 1 };
+  }
+
+  blocks.forEach((block) => {
+    const candidate = [...currentBlocks, block];
+
+    if (currentBlocks.length && !fitsCategoryPage(category, candidate, currentPart)) {
+      pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0));
+      currentPageNumber += 1;
+      currentPart += 1;
+      currentBlocks = [block];
+    } else {
+      currentBlocks = candidate;
+    }
+  });
+
+  if (currentBlocks.length) {
+    pages.push(renderCategoryPage(category, currentBlocks.join(""), currentPageNumber, currentPart, 0));
+  }
+
+  const totalParts = pages.length;
+
+  const finalPages = pages.map((pageHtml, index) => {
+    return pageHtml.replaceAll("__TOTAL_PARTS__", String(totalParts)).replaceAll("__PART_NUMBER__", String(index + 1));
+  });
+
+  return {
+    htmlPages: finalPages,
+    count: finalPages.length
+  };
+}
+
+function fitsCategoryPage(category, blocks, partNumber) {
+  const measure = getMeasureZone();
+  measure.innerHTML = renderCategoryPage(category, blocks.join(""), 999, partNumber, 1, true);
+
+  const area = measure.querySelector(".pdf-content-area");
+  if (!area) return true;
+
+  return area.scrollHeight <= area.clientHeight;
+}
+
+function getMeasureZone() {
+  let zone = document.getElementById("measureZone");
+
+  if (!zone) {
+    zone = document.createElement("div");
+    zone.id = "measureZone";
+    zone.className = "measure-zone";
+    document.body.appendChild(zone);
+  }
+
+  return zone;
+}
+
+function renderCategoryPage(category, contentHtml, pageNumber, partNumber, totalParts, isMeasure = false) {
+  const isFinal = category.type === "veredito";
+  const isContinuation = partNumber > 1;
+  const title = isContinuation ? `${category.title} — continuação` : category.title;
+  const partLabel = totalParts && totalParts > 1 ? `Parte ${partNumber} de ${totalParts}` : "";
 
   return `
-    <article class="page category-page category-${escapeAttribute(type)}">
-      <img class="page-ornament" src="./assets/ornamento-topo.png" alt="" />
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-kicker">${escapeHtml(type)}</span>
-          <h2 class="page-title">${escapeHtml(title)}</h2>
-        </header>
+    <section class="pdf-page ${isFinal ? "final-page" : ""}">
+      ${renderPageHeader(category.type || "Categoria", title)}
+      <main class="page-body">
+        <div class="pdf-content-area">
+          ${partLabel && !isMeasure ? `<div class="section-summary">${escapeHtml(partLabel)}</div>` : ""}
+          ${category.summary && !isContinuation ? `<div class="section-summary">${renderMarkdown(category.summary)}</div>` : ""}
 
-        ${summary ? `<div class="page-summary">${renderMarkdown(summary)}</div>` : ""}
-
-        <div class="content-block">
-          ${renderMarkdown(content)}
+          ${
+            isFinal
+              ? `<div class="final-box"><h2>Veredito Editorial</h2><div class="content">${contentHtml}</div></div>`
+              : `<div class="content">${contentHtml}</div>`
+          }
         </div>
 
-        ${renderFooter(meta, pageIndex + 1, totalCategories)}
+        ${renderFooter(appState.document.meta, pageNumber)}
+      </main>
+    </section>
+  `;
+}
+
+function renderPageHeader(kicker, title) {
+  return `
+    <header class="page-head">
+      <img class="page-head-logo" src="./assets/logo.png" alt="Logo" />
+      <img class="page-head-ornament" src="./assets/ornamento-topo.png" alt="" />
+
+      <div class="page-head-title">
+        <span>${escapeHtml(kicker)}</span>
+        <h2>${escapeHtml(title)}</h2>
       </div>
-    </article>
+    </header>
   `;
 }
 
 function renderFooter(meta, pageNumber) {
-  const obra = meta.obra || "Feedback Editorial";
-
   return `
-    <footer class="page-footer">
-      <span>${escapeHtml(obra)}</span>
-      <span>Página ${pageNumber}</span>
+    <footer class="footer">
+      <span>${escapeHtml(meta.obra || "Relatório Editorial")}</span>
+      <span>Página ${String(pageNumber).padStart(2, "0")}</span>
     </footer>
   `;
 }
 
-function renderMarkdown(text) {
-  if (!String(text || "").trim()) {
-    return "";
+async function generatePdf() {
+  syncAllEditors();
+  renderPreview();
+
+  const status = document.getElementById("pdfStatus");
+  const button = document.getElementById("generatePdfBtn");
+  const pages = [...document.querySelectorAll("#documentPreview .pdf-page")];
+
+  if (!pages.length) {
+    showToast("Não há páginas para gerar.");
+    return;
   }
 
+  status.classList.remove("hidden");
+  button.disabled = true;
+  button.textContent = "Gerando...";
+
+  try {
+    await waitForAllImages(document.getElementById("documentPreview"));
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    for (let index = 0; index < pages.length; index++) {
+      const canvas = await html2canvas(pages[index], {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.98);
+
+      if (index > 0) pdf.addPage();
+
+      pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+    }
+
+    pdf.save(createPdfFileName(appState.document.meta.obra || "documento"));
+    showToast("PDF gerado com sucesso.");
+  } catch (error) {
+    console.error(error);
+    showToast("Erro ao gerar PDF. Veja o console do navegador.");
+  } finally {
+    status.classList.add("hidden");
+    button.disabled = false;
+    button.textContent = "Gerar PDF";
+  }
+}
+
+function waitForAllImages(root) {
+  const images = [...root.querySelectorAll("img")];
+
+  return Promise.all(images.map((img) => {
+    if (img.complete) return Promise.resolve();
+
+    return new Promise((resolve) => {
+      img.onload = resolve;
+      img.onerror = resolve;
+    });
+  }));
+}
+
+function createPdfFileName(name) {
+  const slug = String(name)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+  return `revisao-editorial-${slug || "documento"}.pdf`;
+}
+
+function markdownToBlocks(text) {
+  if (!String(text || "").trim()) return [];
+
   const lines = String(text).replace(/\r\n/g, "\n").split("\n");
-  const html = [];
+  const blocks = [];
   let paragraph = [];
-  let listItems = [];
-  let orderedItems = [];
-  let blockquote = [];
-  let tableLines = [];
+  let list = [];
+  let ordered = [];
+  let quote = [];
+  let table = [];
 
   const flushParagraph = () => {
     if (paragraph.length) {
-      html.push(`<p>${inlineMarkdown(paragraph.join(" "))}</p>`);
+      blocks.push(`<p>${inlineMarkdown(paragraph.join(" "))}</p>`);
       paragraph = [];
     }
   };
 
   const flushList = () => {
-    if (listItems.length) {
-      html.push(`<ul>${listItems.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`);
-      listItems = [];
+    if (list.length) {
+      blocks.push(`<ul>${list.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`);
+      list = [];
     }
 
-    if (orderedItems.length) {
-      html.push(`<ol>${orderedItems.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ol>`);
-      orderedItems = [];
+    if (ordered.length) {
+      blocks.push(`<ol>${ordered.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ol>`);
+      ordered = [];
     }
   };
 
-  const flushBlockquote = () => {
-    if (blockquote.length) {
-      html.push(`<blockquote>${inlineMarkdown(blockquote.join("<br>"))}</blockquote>`);
-      blockquote = [];
+  const flushQuote = () => {
+    if (quote.length) {
+      blocks.push(`<blockquote>${inlineMarkdown(quote.join("<br>"))}</blockquote>`);
+      quote = [];
     }
   };
 
   const flushTable = () => {
-    if (!tableLines.length) {
-      return;
+    if (table.length) {
+      blocks.push(tableToHtml(table));
+      table = [];
     }
-
-    html.push(markdownTableToHtml(tableLines));
-    tableLines = [];
   };
 
   lines.forEach((rawLine) => {
@@ -957,16 +981,16 @@ function renderMarkdown(text) {
     if (!line) {
       flushParagraph();
       flushList();
-      flushBlockquote();
+      flushQuote();
       flushTable();
       return;
     }
 
-    if (isTableLine(line)) {
+    if (line.startsWith("|") && line.endsWith("|")) {
       flushParagraph();
       flushList();
-      flushBlockquote();
-      tableLines.push(line);
+      flushQuote();
+      table.push(line);
       return;
     }
 
@@ -975,45 +999,45 @@ function renderMarkdown(text) {
     if (line.startsWith("### ")) {
       flushParagraph();
       flushList();
-      flushBlockquote();
-      html.push(`<h3>${inlineMarkdown(line.replace(/^###\s+/, ""))}</h3>`);
+      flushQuote();
+      blocks.push(`<h3>${inlineMarkdown(line.replace(/^###\s+/, ""))}</h3>`);
       return;
     }
 
     if (line.startsWith("## ")) {
       flushParagraph();
       flushList();
-      flushBlockquote();
-      html.push(`<h2>${inlineMarkdown(line.replace(/^##\s+/, ""))}</h2>`);
+      flushQuote();
+      blocks.push(`<h2>${inlineMarkdown(line.replace(/^##\s+/, ""))}</h2>`);
       return;
     }
 
     if (line.startsWith("# ")) {
       flushParagraph();
       flushList();
-      flushBlockquote();
-      html.push(`<h1>${inlineMarkdown(line.replace(/^#\s+/, ""))}</h1>`);
+      flushQuote();
+      blocks.push(`<h1>${inlineMarkdown(line.replace(/^#\s+/, ""))}</h1>`);
       return;
     }
 
     if (line.startsWith(">")) {
       flushParagraph();
       flushList();
-      blockquote.push(line.replace(/^>\s?/, ""));
+      quote.push(line.replace(/^>\s?/, ""));
       return;
     }
 
     if (/^[-*]\s+/.test(line)) {
       flushParagraph();
-      flushBlockquote();
-      listItems.push(line.replace(/^[-*]\s+/, ""));
+      flushQuote();
+      list.push(line.replace(/^[-*]\s+/, ""));
       return;
     }
 
     if (/^\d+\.\s+/.test(line)) {
       flushParagraph();
-      flushBlockquote();
-      orderedItems.push(line.replace(/^\d+\.\s+/, ""));
+      flushQuote();
+      ordered.push(line.replace(/^\d+\.\s+/, ""));
       return;
     }
 
@@ -1022,31 +1046,24 @@ function renderMarkdown(text) {
 
   flushParagraph();
   flushList();
-  flushBlockquote();
+  flushQuote();
   flushTable();
 
-  return html.join("");
+  return blocks;
 }
 
-function isTableLine(line) {
-  return line.startsWith("|") && line.endsWith("|");
+function renderMarkdown(text) {
+  return markdownToBlocks(text).join("");
 }
 
-function markdownTableToHtml(lines) {
-  const filtered = lines.filter((line) => !/^\|\s*-+/.test(line.replace(/\s/g, "")));
+function tableToHtml(lines) {
+  const rows = lines
+    .filter((line) => !/^\|\s*:?-{2,}/.test(line))
+    .map((line) => line.slice(1, -1).split("|").map((cell) => cell.trim()));
 
-  if (!filtered.length) {
-    return "";
-  }
+  if (!rows.length) return "";
 
-  const rows = filtered.map((line) => {
-    return line
-      .slice(1, -1)
-      .split("|")
-      .map((cell) => cell.trim());
-  });
-
-  const head = rows[0] || [];
+  const head = rows[0];
   const body = rows.slice(1);
 
   return `
@@ -1062,13 +1079,11 @@ function markdownTableToHtml(lines) {
 }
 
 function inlineMarkdown(text) {
-  let safe = escapeHtml(text);
-
-  safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  safe = safe.replace(/\*(.*?)\*/g, "<em>$1</em>");
-  safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-  return safe;
+  let html = escapeHtml(text);
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+  return html;
 }
 
 function escapeHtml(value) {
@@ -1080,41 +1095,21 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function escapeAttribute(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]/g, "-");
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text)
+    .then(() => showToast("Prompt copiado."))
+    .catch(() => showToast("Não foi possível copiar automaticamente."));
 }
 
-async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("Prompt copiado.");
-  } catch (error) {
-    showToast("Não foi possível copiar automaticamente. Selecione e copie manualmente.");
-  }
-}
-
-function saveToStorage() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState.document));
-  showToast("Documento salvo no navegador.");
-}
-
-function loadFromStorage(showMessage = true) {
+function loadFromStorage() {
   const saved = localStorage.getItem(STORAGE_KEY);
 
-  if (!saved) {
-    return;
-  }
+  if (!saved) return;
 
   try {
     appState.document = JSON.parse(saved);
     appState.selectedCategoryIndex = appState.document.categories?.length ? 0 : -1;
-
-    if (showMessage) {
-      showToast("Documento carregado.");
-    }
-  } catch (error) {
+  } catch {
     localStorage.removeItem(STORAGE_KEY);
   }
 }
@@ -1125,19 +1120,19 @@ function showToast(message) {
   toast.textContent = message;
   toast.classList.add("show");
 
-  window.clearTimeout(showToast.timeout);
+  clearTimeout(showToast.timeout);
 
-  showToast.timeout = window.setTimeout(() => {
+  showToast.timeout = setTimeout(() => {
     toast.classList.remove("show");
   }, 2600);
 }
 
 function getExampleText() {
   return `[TITULO_RELATORIO]
-Revisão Editorial Profissional
+Relatório de Revisão Editorial
 
 [SUBTITULO_RELATORIO]
-Relatório completo de avaliação literária
+Revisão editorial extremamente detalhada
 
 [OBRA]
 O Amado da Luzz
@@ -1146,7 +1141,7 @@ O Amado da Luzz
 Não informado
 
 [AVALIADOR]
-Não informado
+Administração do Projeto
 
 [TIPO_REVISAO]
 Revisão Editorial Profissional
@@ -1196,7 +1191,7 @@ O manuscrito tem estrutura, ambição e coração, mas ainda precisa de reescrit
 Necessita reescrita estrutural e refinamento literário.
 
 [DATA]
-Não informado.
+Não informado
 
 [OBSERVACOES_GERAIS]
 Documento de exemplo para testar a plataforma.
@@ -1223,6 +1218,8 @@ A força literária do texto aparece principalmente na energia da jornada. O lei
 - Excesso de exposição direta.
 - Necessidade de mais cenas vividas pelo leitor.
 
+A clareza narrativa é razoável. O leitor consegue acompanhar o objetivo principal, mas a quantidade de nomes, raças, cidades, deuses, mestres, relíquias, demônios, locais e sistemas mágicos pode criar sobrecarga. A revisão deve preservar a ambição, mas controlar melhor a entrada de informações.
+
 [FIM_CATEGORIA]
 
 [CATEGORIA]
@@ -1240,6 +1237,10 @@ Os personagens têm funções claras, mas precisam de mais individualidade, cont
 | Arion | Protagonista e eixo do grupo | Trauma fundador forte | Risco de escolhido genérico | Dar erros morais e consequências |
 | Thalia | Aliada elemental | Poder visual e trauma forte | Pode ser reduzida ao cuidado com Arion | Dar objetivos próprios |
 | Bakrium | Antagonista ambíguo | Carisma e tensão moral | Redenção pode parecer rápida | Construir confiança lentamente |
+
+Arion sustenta a história porque carrega uma ferida clara: ele sobreviveu ao fim de Eldanesh e se culpa por isso. Essa ferida dá coerência ao seu isolamento, sua vida como mercenário e sua resistência ao chamado.
+
+Thalia possui forte potencial emocional, mas precisa de objetivos próprios além do cuidado com Arion. Draven precisa ter sua mutilação tratada como arco contínuo, não apenas como choque de batalha. Tark deve resolver problemas maiores com inteligência, não apenas servir como alívio cômico.
 
 [FIM_CATEGORIA]
 
@@ -1268,6 +1269,8 @@ Transformar intensidade em substituto de profundidade.
 ## Parecer final
 
 Existe uma saga aqui. Existe um protagonista. Existe um antagonista promissor. Existe uma mitologia com potencial. A próxima etapa não é diminuir a fantasia, nem tirar a grandiosidade. É dar sustentação a ela.
+
+Quando essa pergunta começar a contaminar cada vitória, cada aliança e cada escolha, O Amado da Luzz deixará de ser apenas uma fantasia épica promissora e começará a se tornar uma história realmente memorável.
 
 [FIM_CATEGORIA]`;
 }

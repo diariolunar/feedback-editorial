@@ -287,11 +287,52 @@ button {
   box-shadow: var(--shadow);
 }
 
+.validation-box {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(107, 33, 168, 0.2);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.validation-box.success {
+  border-color: rgba(22, 163, 74, 0.35);
+}
+
+.validation-box.warning {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.validation-box.error {
+  border-color: rgba(220, 38, 38, 0.45);
+}
+
+.validation-box h3 {
+  margin: 0 0 10px;
+  color: var(--purple);
+  font-family: var(--serif);
+}
+
+.validation-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.validation-box li {
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
 .editor-grid {
   display: grid;
-  grid-template-columns: minmax(300px, 0.82fr) minmax(430px, 1.18fr);
+  grid-template-columns: minmax(300px, 0.82fr) minmax(300px, 0.82fr);
   gap: 18px;
   align-items: start;
+}
+
+.category-editor-card {
+  grid-column: 1 / -1;
 }
 
 .form-grid {
@@ -1043,6 +1084,10 @@ select:focus {
   .ui-grid,
   .editor-grid {
     grid-template-columns: 1fr;
+  }
+
+  .category-editor-card {
+    grid-column: auto;
   }
 }
 

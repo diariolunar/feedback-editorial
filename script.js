@@ -1,4 +1,4 @@
-const STORAGE_KEY = "feedback_editorial_documento_v8";
+const STORAGE_KEY = "feedback_editorial_documento_v9";
 
 const appState = {
   selectedCategoryIndex: -1,
@@ -86,6 +86,10 @@ REGRAS IMPORTANTES:
 8. Preserve exemplos de reescrita.
 9. Preserve o tom técnico editorial.
 10. Entregue apenas o documento padronizado, sem comentários antes ou depois.
+11. Todos os títulos de categorias devem estar em português.
+12. Use termos em inglês apenas quando forem expressões já consagradas no meio editorial ou literário, como Show vs Tell e Worldbuilding. Mesmo nesses casos, coloque a tradução em português antes e o termo em inglês entre parênteses.
+13. Não use títulos como General Editorial Diagnosis, Scene Engineering, Character Development, Reader Experience, Market Potential, Line-Level Editing ou Final Editorial Verdict. Traduza para português.
+14. Preserve a densidade e a ordem lógica da revisão original.
 
 Use exatamente este formato:
 
@@ -99,13 +103,13 @@ Relatório de Revisão Editorial
 Revisão editorial extremamente detalhada
 
 [NOME_PROJETO]
-Administração do Projeto
+Ascensão Lunar
 
 [RESPONSAVEL]
-Administração do Projeto
+Mayke Arrais
 
 [EMAIL_PROJETO]
-Não informado
+mayke.escrita92@gmail.com
 
 [SITE_PROJETO]
 Não informado
@@ -126,7 +130,7 @@ Nome da obra
 Nome do autor ou Não informado
 
 [AVALIADOR]
-Nome do avaliador ou Não informado
+Ascensão Lunar
 
 [TIPO_REVISAO]
 Tipo de revisão
@@ -179,7 +183,7 @@ Observações gerais
 Depois organize todo o restante em categorias:
 
 [CATEGORIA]
-Nome da categoria
+Nome da categoria em português
 
 [TIPO_CATEGORIA]
 texto, diagnostico, estrutura, ritmo, cenas, personagens, dialogos, prosa, mundo, tema, gramatica, reescrita, pontos_fortes, pontos_fracos, prioridades, plano_de_melhoria, mercado, sensibilidade, veredito, lista, tabela ou outro
@@ -192,8 +196,43 @@ Conteúdo completo da categoria.
 
 [FIM_CATEGORIA]
 
-Categorias recomendadas:
-Diagnóstico Editorial Geral; Premissa e Promessa Narrativa; Estrutura Narrativa; Ritmo; Engenharia de Cenas; Desenvolvimento de Personagens; Relações; Diálogos; Voz Narrativa; Prosa e Estilo; Clareza; Show vs Tell; Subtexto; Construção Emocional; Tensão Narrativa; Consistência Interna; Worldbuilding; Tema e Simbolismo; Originalidade; Gramática e Revisão Técnica; Edição Linha a Linha; Experiência do Leitor; Potencial de Mercado; Sensibilidade e Representação; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Sugestões Concretas de Reescrita; Veredito Editorial Final.
+Categorias recomendadas em português:
+Diagnóstico Editorial Geral; Premissa e Promessa Narrativa; Estrutura Narrativa; Ritmo Narrativo; Engenharia de Cenas; Desenvolvimento de Personagens; Análise do Protagonista; Forças Antagônicas; Relações Entre Personagens; Análise de Diálogos; Voz Narrativa; Ponto de Vista; Prosa e Estilo; Clareza Textual; Mostrar em vez de Contar (Show vs Tell); Subtexto; Construção Emocional; Tensão Narrativa; Consistência Interna; Construção de Mundo (Worldbuilding); Atmosfera e Ambientação; Tema e Simbolismo; Originalidade; Gramática e Revisão Técnica; Edição Linha a Linha; Experiência do Leitor; Potencial de Mercado; Sensibilidade e Representação; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Sugestões Concretas de Reescrita; Veredito Editorial Final.
+
+Se o texto original tiver seções com títulos em inglês, traduza assim:
+- General Editorial Diagnosis → Diagnóstico Editorial Geral
+- Premise and Narrative Promise → Premissa e Promessa Narrativa
+- Narrative Structure → Estrutura Narrativa
+- Narrative Pacing → Ritmo Narrativo
+- Scene Engineering → Engenharia de Cenas
+- Character Development → Desenvolvimento de Personagens
+- Protagonist Analysis → Análise do Protagonista
+- Antagonistic Forces → Forças Antagônicas
+- Character Relationships → Relações Entre Personagens
+- Dialogue Analysis → Análise de Diálogos
+- Narrative Voice → Voz Narrativa
+- Point of View → Ponto de Vista
+- Prose and Style → Prosa e Estilo
+- Clarity → Clareza Textual
+- Show vs Tell → Mostrar em vez de Contar (Show vs Tell)
+- Emotional Construction → Construção Emocional
+- Narrative Tension → Tensão Narrativa
+- Internal Consistency → Consistência Interna
+- Worldbuilding → Construção de Mundo (Worldbuilding)
+- Atmosphere and Setting → Atmosfera e Ambientação
+- Theme and Symbolism → Tema e Simbolismo
+- Originality → Originalidade
+- Grammar and Technical Revision → Gramática e Revisão Técnica
+- Line-Level Editing → Edição Linha a Linha
+- Reader Experience → Experiência do Leitor
+- Market Potential → Potencial de Mercado
+- Sensitivity and Representation → Sensibilidade e Representação
+- Strengths → Pontos Fortes
+- Weaknesses → Pontos de Atenção
+- Rewrite Priorities → Prioridades de Reescrita
+- Practical Improvement Plan → Plano Prático de Melhoria
+- Concrete Rewrite Suggestions → Sugestões Concretas de Reescrita
+- Final Editorial Verdict → Veredito Editorial Final
 
 Agora organize o texto abaixo:
 
@@ -210,6 +249,9 @@ REGRAS:
 4. Reduza para cerca de 20% a 35% do original.
 5. Preserve os pontos realmente importantes.
 6. Entregue apenas o documento padronizado.
+7. Todos os títulos de categorias devem estar em português.
+8. Use termos em inglês apenas quando forem expressões já consagradas no meio editorial ou literário, como Show vs Tell e Worldbuilding. Mesmo nesses casos, coloque a tradução em português antes e o termo em inglês entre parênteses.
+9. Não use títulos como General Editorial Diagnosis, Scene Engineering, Character Development, Reader Experience, Market Potential, Line-Level Editing ou Final Editorial Verdict. Traduza para português.
 
 Use exatamente este padrão:
 
@@ -223,13 +265,13 @@ Relatório de Revisão Editorial
 Versão resumida
 
 [NOME_PROJETO]
-Administração do Projeto
+Ascensão Lunar
 
 [RESPONSAVEL]
-Administração do Projeto
+Mayke Arrais
 
 [EMAIL_PROJETO]
-Não informado
+mayke.escrita92@gmail.com
 
 [SITE_PROJETO]
 Não informado
@@ -250,7 +292,7 @@ Nome da obra
 Nome do autor ou Não informado
 
 [AVALIADOR]
-Nome do avaliador ou Não informado
+Ascensão Lunar
 
 [TIPO_REVISAO]
 Tipo de revisão
@@ -301,12 +343,12 @@ Data ou Não informado
 Observações gerais
 
 Depois organize nas categorias:
-Diagnóstico Editorial Geral; Gênero, Público e Tom; Premissa e Promessa Narrativa; Estrutura e Ritmo; Personagens e Relações; Prosa, Voz e Diálogos; Mundo, Tema e Originalidade; Gramática e Revisão Técnica; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Potencial de Mercado; Veredito Editorial Final.
+Diagnóstico Editorial Geral; Gênero, Público e Tom; Premissa e Promessa Narrativa; Estrutura e Ritmo; Personagens e Relações; Prosa, Voz e Diálogos; Construção de Mundo (Worldbuilding), Tema e Originalidade; Gramática e Revisão Técnica; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Potencial de Mercado; Veredito Editorial Final.
 
 Cada categoria deve seguir:
 
 [CATEGORIA]
-Nome da categoria
+Nome da categoria em português
 
 [TIPO_CATEGORIA]
 tipo
@@ -318,6 +360,41 @@ Resumo curto.
 Conteúdo resumido.
 
 [FIM_CATEGORIA]
+
+Se o texto original tiver seções com títulos em inglês, traduza assim:
+- General Editorial Diagnosis → Diagnóstico Editorial Geral
+- Premise and Narrative Promise → Premissa e Promessa Narrativa
+- Narrative Structure → Estrutura Narrativa
+- Narrative Pacing → Ritmo Narrativo
+- Scene Engineering → Engenharia de Cenas
+- Character Development → Desenvolvimento de Personagens
+- Protagonist Analysis → Análise do Protagonista
+- Antagonistic Forces → Forças Antagônicas
+- Character Relationships → Relações Entre Personagens
+- Dialogue Analysis → Análise de Diálogos
+- Narrative Voice → Voz Narrativa
+- Point of View → Ponto de Vista
+- Prose and Style → Prosa e Estilo
+- Clarity → Clareza Textual
+- Show vs Tell → Mostrar em vez de Contar (Show vs Tell)
+- Emotional Construction → Construção Emocional
+- Narrative Tension → Tensão Narrativa
+- Internal Consistency → Consistência Interna
+- Worldbuilding → Construção de Mundo (Worldbuilding)
+- Atmosphere and Setting → Atmosfera e Ambientação
+- Theme and Symbolism → Tema e Simbolismo
+- Originality → Originalidade
+- Grammar and Technical Revision → Gramática e Revisão Técnica
+- Line-Level Editing → Edição Linha a Linha
+- Reader Experience → Experiência do Leitor
+- Market Potential → Potencial de Mercado
+- Sensitivity and Representation → Sensibilidade e Representação
+- Strengths → Pontos Fortes
+- Weaknesses → Pontos de Atenção
+- Rewrite Priorities → Prioridades de Reescrita
+- Practical Improvement Plan → Plano Prático de Melhoria
+- Concrete Rewrite Suggestions → Sugestões Concretas de Reescrita
+- Final Editorial Verdict → Veredito Editorial Final
 
 Agora organize o texto abaixo:
 
@@ -475,9 +552,9 @@ function applyDefaults() {
   meta.tipoDocumento ||= "revisao_completa";
   meta.tituloRelatorio ||= getDocTypeConfig(meta.tipoDocumento).title;
   meta.subtituloRelatorio ||= getDocTypeConfig(meta.tipoDocumento).subtitle;
-  meta.nomeProjeto ||= "Administração do Projeto";
-  meta.responsavel ||= meta.avaliador || "Administração do Projeto";
-  meta.emailProjeto ||= "Não informado";
+  meta.nomeProjeto ||= "Ascensão Lunar";
+  meta.responsavel ||= "Mayke Arrais";
+  meta.emailProjeto ||= "mayke.escrita92@gmail.com";
   meta.siteProjeto ||= "Não informado";
   meta.dataRevisao ||= meta.data || "Não informado";
   meta.versaoDocumento ||= "Versão 1.0";
@@ -830,7 +907,7 @@ function renderCover(meta) {
       <div class="cover-content">
         <div class="cover-top">
           <img class="cover-logo" src="./assets/logo.png" alt="Logo" />
-          <div class="cover-brand">${escapeHtml(meta.nomeProjeto || "Administração do Projeto")}</div>
+          <div class="cover-brand">${escapeHtml(meta.nomeProjeto || "Ascensão Lunar")}</div>
         </div>
 
         <div class="cover-main">
@@ -1145,12 +1222,12 @@ function renderFinalPage(category, categoryIndex, pageNumber, htmlContent) {
 
             <div class="signatures">
               <div class="signature">
-                <div class="signature-name">${escapeHtml(appState.document.meta.avaliador || "Avaliador")}</div>
+                <div class="signature-name">${escapeHtml(appState.document.meta.avaliador || "Ascensão Lunar")}</div>
                 <div class="signature-role">Responsável pela revisão</div>
               </div>
 
               <div class="signature">
-                <div class="signature-name">${escapeHtml(appState.document.meta.nomeProjeto || "Administração do Projeto")}</div>
+                <div class="signature-name">${escapeHtml(appState.document.meta.nomeProjeto || "Ascensão Lunar")}</div>
                 <div class="signature-role">Grupo de gestão e estratégia</div>
               </div>
             </div>
@@ -1181,7 +1258,7 @@ function renderHeader(meta, label, pageNumber) {
 function renderFooter(meta) {
   return `
     <footer class="doc-footer">
-      <strong>${escapeHtml(meta.nomeProjeto || "Administração do Projeto")}</strong>
+      <strong>${escapeHtml(meta.nomeProjeto || "Ascensão Lunar")}</strong>
       <span>${escapeHtml(meta.confidencialidade || "Relatório Editorial Profissional")}</span>
     </footer>
   `;
@@ -1592,16 +1669,16 @@ Relatório de Revisão Editorial
 Revisão editorial extremamente detalhada
 
 [NOME_PROJETO]
-Administração do Projeto
+Ascensão Lunar
 
 [RESPONSAVEL]
-Administração do Projeto
+Mayke Arrais
 
 [EMAIL_PROJETO]
-contato@administracaodoprojeto.com.br
+mayke.escrita92@gmail.com
 
 [SITE_PROJETO]
-administracaodoprojeto.com.br
+Não informado
 
 [DATA_REVISAO]
 Não informado
@@ -1619,7 +1696,7 @@ O Amado da Luzz
 Não informado
 
 [AVALIADOR]
-Administração do Projeto
+Ascensão Lunar
 
 [TIPO_REVISAO]
 Revisão Editorial Profissional

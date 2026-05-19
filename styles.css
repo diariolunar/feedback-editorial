@@ -509,10 +509,12 @@ select:focus {
 }
 
 .cover-ornament {
-  width: 560px;
-  max-height: 152px;
+  width: 100%;
+  max-width: 650px;
+  height: auto;
   object-fit: contain;
   margin: 0 auto 28px;
+  display: block;
 }
 
 .cover-kicker {
@@ -600,9 +602,10 @@ select:focus {
 
 .page-head {
   width: 100%;
-  height: 185px;
+  height: 170px;
   position: relative;
-  overflow: hidden;
+  z-index: 5;
+  overflow: visible;
   background: var(--roxo-noite);
   border-bottom: 3px solid var(--dourado);
 }
@@ -611,15 +614,18 @@ select:focus {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center top;
+  position: relative;
+  z-index: 6;
 }
 
 .section-title-block {
-  margin: 34px 66px 0;
-  padding-bottom: 18px;
+  margin: 30px 66px 0;
+  padding-bottom: 16px;
   border-bottom: 2px solid rgba(245, 200, 66, 0.8);
   position: relative;
+  z-index: 2;
 }
 
 .section-title-block::after {
@@ -651,13 +657,14 @@ select:focus {
 }
 
 .page-body {
-  height: calc(1123px - 185px - 112px);
-  padding: 28px 66px 76px;
+  height: calc(1123px - 170px - 106px);
+  padding: 26px 66px 76px;
   position: relative;
+  z-index: 1;
 }
 
 .pdf-content-area {
-  max-height: 720px;
+  max-height: 732px;
   overflow: hidden;
 }
 
@@ -670,13 +677,17 @@ select:focus {
   border-radius: 0 16px 16px 0;
   font-family: var(--serif);
   font-size: 0.98rem;
-  line-height: 1.5;
+  line-height: 1.55;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .content {
   color: var(--texto);
   font-size: 0.88rem;
-  line-height: 1.52;
+  line-height: 1.55;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .content h1,
@@ -684,6 +695,7 @@ select:focus {
 .content h3 {
   color: var(--roxo-escuro);
   font-family: var(--serif);
+  text-align: left;
 }
 
 .content h1 {
@@ -703,16 +715,20 @@ select:focus {
 
 .content p {
   margin: 0 0 9px;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .content ul,
 .content ol {
   margin: 7px 0 10px;
   padding-left: 21px;
+  text-align: left;
 }
 
 .content li {
   margin-bottom: 4px;
+  text-align: left;
 }
 
 .content blockquote {
@@ -723,6 +739,8 @@ select:focus {
   border-left: 5px solid var(--dourado);
   border-radius: 0 14px 14px 0;
   font-family: var(--serif);
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .content table {
@@ -731,6 +749,7 @@ select:focus {
   border-collapse: collapse;
   font-size: 0.68rem;
   line-height: 1.25;
+  text-align: left;
 }
 
 .content th,
@@ -738,6 +757,7 @@ select:focus {
   padding: 7px;
   border: 1px solid rgba(107, 33, 168, 0.25);
   vertical-align: top;
+  text-align: left;
 }
 
 .content th {
@@ -752,7 +772,7 @@ select:focus {
 
 .info-row {
   display: grid;
-  grid-template-columns: 188px 1fr;
+  grid-template-columns: 176px 1fr;
   min-height: 50px;
   border: 1px solid rgba(107, 33, 168, 0.18);
   background: rgba(255, 255, 255, 0.45);
@@ -766,13 +786,20 @@ select:focus {
   color: white;
   background: var(--roxo-escuro);
   font-weight: 900;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-align: center;
 }
 
 .info-value {
   padding: 12px 15px;
-  line-height: 1.42;
+  line-height: 1.45;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.info-value p {
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .footer {

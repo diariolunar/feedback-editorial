@@ -2,15 +2,15 @@
   --roxo: #6b21a8;
   --roxo-escuro: #3b0764;
   --roxo-noite: #100018;
-  --roxo-card: #271034;
+  --roxo-preto: #08000d;
   --dourado: #f5c842;
-  --dourado-suave: #e4c779;
-  --papel: #fbf6ea;
-  --papel-2: #f3ead9;
+  --dourado-suave: #d7b35a;
+  --papel: #fbf7ed;
+  --papel-2: #f1e7d6;
+  --texto: #201629;
+  --texto-suave: #675c6f;
   --linha: rgba(59, 7, 100, 0.14);
-  --linha-dourada: rgba(245, 200, 66, 0.55);
-  --texto: #22162b;
-  --texto-suave: #6b6070;
+  --linha-dourada: rgba(245, 200, 66, 0.56);
   --sombra: 0 24px 70px rgba(0, 0, 0, 0.2);
   --serif: Georgia, "Times New Roman", serif;
   --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -30,7 +30,7 @@ body {
   color: var(--texto);
   font-family: var(--sans);
   background:
-    radial-gradient(circle at top right, rgba(107, 33, 168, 0.35), transparent 36%),
+    radial-gradient(circle at top right, rgba(107, 33, 168, 0.38), transparent 34%),
     linear-gradient(135deg, #160122, #3b0764 52%, #100018);
 }
 
@@ -59,7 +59,7 @@ button {
   padding: 24px;
   color: white;
   background:
-    linear-gradient(rgba(13, 0, 20, 0.94), rgba(59, 7, 100, 0.9)),
+    linear-gradient(rgba(13, 0, 20, 0.94), rgba(59, 7, 100, 0.92)),
     url("./assets/textura-fundo-escuro.png");
   background-size: cover;
   border-right: 1px solid rgba(245, 200, 66, 0.25);
@@ -463,32 +463,25 @@ select:focus {
   height: 1123px;
   overflow: hidden;
   background:
-    linear-gradient(135deg, rgba(251, 246, 234, 0.98), rgba(243, 234, 217, 0.98)),
+    linear-gradient(135deg, rgba(251, 247, 237, 0.98), rgba(241, 231, 214, 0.98)),
     url("./assets/textura-fundo-claro.png");
   background-size: cover;
   box-shadow: 0 22px 80px rgba(0, 0, 0, 0.28);
 }
 
-.pdf-page::before {
-  content: "";
-  position: absolute;
-  inset: 22px;
-  border: 1px solid rgba(245, 200, 66, 0.38);
-  pointer-events: none;
-}
-
 .pdf-page.dark {
   background:
-    radial-gradient(circle at top right, rgba(107, 33, 168, 0.28), transparent 38%),
-    linear-gradient(135deg, rgba(12, 0, 18, 0.97), rgba(44, 7, 64, 0.96)),
+    radial-gradient(circle at top right, rgba(107, 33, 168, 0.26), transparent 42%),
+    linear-gradient(135deg, rgba(10, 0, 15, 0.98), rgba(38, 4, 58, 0.97)),
     url("./assets/textura-fundo-escuro.png");
   background-size: cover;
 }
 
 .cover-frame {
   position: absolute;
-  inset: 28px;
-  border: 1.6px solid rgba(245, 200, 66, 0.62);
+  inset: 30px;
+  border: 1.5px solid rgba(245, 200, 66, 0.62);
+  pointer-events: none;
 }
 
 .cover-content {
@@ -524,11 +517,11 @@ select:focus {
 }
 
 .cover-main {
-  margin-top: 96px;
+  margin-top: 92px;
 }
 
 .cover-kicker {
-  margin-bottom: 14px;
+  margin-bottom: 15px;
   color: var(--dourado);
   font-size: 0.78rem;
   font-weight: 900;
@@ -538,11 +531,11 @@ select:focus {
 
 .cover-title {
   margin: 0;
-  max-width: 560px;
+  max-width: 570px;
   color: white;
   font-family: var(--serif);
-  font-size: 4.15rem;
-  line-height: 0.98;
+  font-size: 4.04rem;
+  line-height: 1;
   letter-spacing: -0.02em;
 }
 
@@ -553,15 +546,15 @@ select:focus {
 
 .cover-subtitle {
   margin: 28px 0 0;
-  max-width: 520px;
-  color: rgba(255, 255, 255, 0.74);
-  font-size: 1.04rem;
+  max-width: 540px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1.02rem;
   line-height: 1.65;
 }
 
 .cover-work {
   margin-top: 58px;
-  padding: 26px 0;
+  padding: 25px 0;
   border-top: 1px solid rgba(245, 200, 66, 0.38);
   border-bottom: 1px solid rgba(245, 200, 66, 0.38);
 }
@@ -580,7 +573,7 @@ select:focus {
   margin-top: 9px;
   color: white;
   font-family: var(--serif);
-  font-size: 2.25rem;
+  font-size: 2.22rem;
 }
 
 .cover-meta {
@@ -613,115 +606,199 @@ select:focus {
   line-height: 1.32;
 }
 
+/* Cabeçalho profissional com identidade forte, mas sem parecer banner colado */
+
 .doc-header {
-  height: 94px;
-  padding: 20px 56px;
-  display: flex;
+  height: 154px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 112px 1fr 160px;
   align-items: center;
-  gap: 18px;
+  gap: 26px;
+  padding: 24px 54px;
   color: white;
   background:
-    linear-gradient(90deg, rgba(18, 0, 28, 0.97), rgba(59, 7, 100, 0.95)),
+    radial-gradient(circle at 84% 28%, rgba(107, 33, 168, 0.58), transparent 28%),
+    linear-gradient(90deg, rgba(8, 0, 13, 0.98), rgba(42, 4, 62, 0.98)),
     url("./assets/textura-fundo-escuro.png");
   background-size: cover;
   border-bottom: 3px solid var(--dourado);
 }
 
-.doc-header-logo {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  flex: 0 0 auto;
+.doc-header::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -11px;
+  width: 22px;
+  height: 22px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--dourado);
+  border: 4px solid var(--papel);
 }
 
-.doc-header-text {
+.doc-header-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 16px rgba(107, 33, 168, 0.72));
+}
+
+.doc-header-title {
   min-width: 0;
 }
 
-.doc-header-text span {
-  display: block;
+.doc-header-title .doc-number {
+  display: inline-block;
+  margin-right: 12px;
   color: var(--dourado);
-  font-size: 0.68rem;
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.doc-header-title span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--dourado);
+  font-size: 0.66rem;
   font-weight: 900;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
-.doc-header-text strong {
+.doc-header-title strong {
   display: block;
-  margin-top: 4px;
+  max-width: 440px;
   color: white;
   font-family: var(--serif);
-  font-size: 1.22rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 2rem;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.doc-header-rule {
+  width: 180px;
+  height: 1px;
+  margin-top: 16px;
+  background: linear-gradient(90deg, var(--dourado), transparent);
+}
+
+.doc-header-mark {
+  align-self: stretch;
+  position: relative;
+  opacity: 0.92;
+}
+
+.doc-header-mark::before {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--dourado), transparent);
+}
+
+.doc-header-mark::after {
+  content: "✦";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  color: var(--dourado);
+  font-size: 2rem;
+  transform: translateY(-50%);
 }
 
 .page-inner {
-  height: calc(1123px - 94px);
-  padding: 42px 64px 74px;
+  height: calc(1123px - 154px - 74px);
+  padding: 46px 64px 26px;
   position: relative;
 }
 
-.section-title {
-  margin-bottom: 24px;
-}
-
-.section-title .kicker {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--roxo);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.section-title h2 {
-  margin: 0;
-  color: var(--roxo-escuro);
-  font-family: var(--serif);
-  font-size: 2.25rem;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-}
-
-.title-rule {
-  width: 100%;
-  height: 2px;
-  margin-top: 16px;
-  background: linear-gradient(90deg, var(--roxo), var(--dourado), transparent);
-}
-
 .page-content-area {
-  max-height: 804px;
+  max-height: 790px;
   overflow: hidden;
 }
 
-.editorial-note {
-  margin-bottom: 22px;
-  padding: 18px 22px;
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: var(--roxo-escuro);
+  border: 2px solid var(--dourado);
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 900;
+  box-shadow: 0 8px 22px rgba(59, 7, 100, 0.14);
+}
+
+.section-heading-text {
+  min-width: 0;
+  flex: 1;
+  padding-top: 3px;
+}
+
+.section-heading-text span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--roxo);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.section-heading-text h2 {
+  margin: 0;
   color: var(--roxo-escuro);
-  background: rgba(255, 255, 255, 0.55);
-  border-left: 5px solid var(--dourado);
-  box-shadow: 0 12px 36px rgba(59, 7, 100, 0.06);
   font-family: var(--serif);
-  font-size: 0.99rem;
-  line-height: 1.58;
+  font-size: 1.72rem;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+.section-rule {
+  width: 100%;
+  height: 2px;
+  margin-top: 10px;
+  background: linear-gradient(90deg, var(--roxo), var(--dourado), transparent);
+}
+
+.editorial-note {
+  margin-bottom: 18px;
+  padding: 15px 18px;
+  color: var(--texto);
+  background: rgba(255, 255, 255, 0.62);
+  border-left: 5px solid var(--dourado);
+  font-family: var(--serif);
+  font-size: 0.92rem;
+  line-height: 1.5;
   text-align: justify;
 }
 
 .ficha-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 12px;
 }
 
 .ficha-card {
-  min-height: 94px;
-  padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.54);
+  min-height: 82px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.56);
   border: 1px solid rgba(59, 7, 100, 0.12);
   border-top: 3px solid var(--roxo);
 }
@@ -732,9 +809,9 @@ select:focus {
 
 .ficha-card span {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 6px;
   color: var(--roxo);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -746,10 +823,16 @@ select:focus {
   margin: 0;
 }
 
+.section-box {
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(59, 7, 100, 0.12);
+}
+
 .content {
   color: var(--texto);
-  font-size: 0.91rem;
-  line-height: 1.58;
+  font-size: 0.84rem;
+  line-height: 1.5;
   text-align: justify;
   text-justify: inter-word;
 }
@@ -764,42 +847,42 @@ select:focus {
 }
 
 .content h1 {
-  margin: 18px 0 10px;
-  font-size: 1.6rem;
+  margin: 15px 0 8px;
+  font-size: 1.34rem;
 }
 
 .content h2 {
-  margin: 16px 0 9px;
-  font-size: 1.35rem;
+  margin: 13px 0 7px;
+  font-size: 1.14rem;
 }
 
 .content h3 {
-  margin: 14px 0 8px;
-  font-size: 1.12rem;
+  margin: 11px 0 6px;
+  font-size: 1rem;
 }
 
 .content p {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   text-align: justify;
 }
 
 .content ul,
 .content ol {
-  margin: 7px 0 12px;
+  margin: 6px 0 10px;
   padding-left: 22px;
   text-align: left;
 }
 
 .content li {
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   text-align: left;
 }
 
 .content blockquote {
-  margin: 14px 0;
-  padding: 15px 18px;
+  margin: 12px 0;
+  padding: 13px 16px;
   color: var(--roxo-escuro);
-  background: rgba(255, 255, 255, 0.56);
+  background: rgba(255, 255, 255, 0.58);
   border-left: 5px solid var(--roxo);
   font-family: var(--serif);
   text-align: justify;
@@ -807,84 +890,154 @@ select:focus {
 
 .content table {
   width: 100%;
-  margin: 13px 0;
-  border-collapse: collapse;
-  font-size: 0.72rem;
-  line-height: 1.28;
+  margin: 10px 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.66rem;
+  line-height: 1.22;
   text-align: left;
-  background: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(59, 7, 100, 0.18);
+  overflow: hidden;
 }
 
 .content th,
 .content td {
-  padding: 8px;
-  border: 1px solid rgba(59, 7, 100, 0.16);
+  padding: 7px 8px;
+  border-right: 1px solid rgba(59, 7, 100, 0.14);
+  border-bottom: 1px solid rgba(59, 7, 100, 0.14);
   vertical-align: top;
   text-align: left;
 }
 
+.content th:last-child,
+.content td:last-child {
+  border-right: none;
+}
+
+.content tr:last-child td {
+  border-bottom: none;
+}
+
 .content th {
   color: white;
-  background: var(--roxo-escuro);
-}
-
-.section-box {
-  padding: 22px 24px;
-  background: rgba(255, 255, 255, 0.48);
-  border: 1px solid rgba(59, 7, 100, 0.12);
-  border-top: 3px solid var(--dourado);
-}
-
-.section-box.veredito {
-  border-top-color: var(--roxo);
+  background: linear-gradient(90deg, var(--roxo-preto), var(--roxo-escuro));
+  font-weight: 800;
 }
 
 .continuation-label {
-  margin-bottom: 18px;
-  padding: 9px 12px;
+  margin-bottom: 14px;
+  padding: 8px 11px;
   display: inline-block;
   color: var(--roxo-escuro);
   background: rgba(245, 200, 66, 0.16);
   border: 1px solid rgba(245, 200, 66, 0.36);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .final-card {
-  min-height: 560px;
-  padding: 42px 46px;
+  min-height: 520px;
+  padding: 36px 42px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(255, 247, 230, 0.42));
+    linear-gradient(135deg, rgba(255, 255, 255, 0.66), rgba(255, 247, 230, 0.48));
   border: 1.4px solid rgba(245, 200, 66, 0.68);
 }
 
 .final-card h3 {
-  margin: 0 0 24px;
+  margin: 0 0 22px;
   color: var(--roxo-escuro);
   font-family: var(--serif);
-  font-size: 2.1rem;
+  font-size: 1.95rem;
   line-height: 1.05;
   text-align: center;
 }
 
-.doc-footer {
-  position: absolute;
-  left: 64px;
-  right: 64px;
-  bottom: 30px;
-  display: flex;
-  justify-content: space-between;
+.info-callout {
+  margin-top: 16px;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: 110px 1fr;
   gap: 18px;
-  padding-top: 12px;
-  color: rgba(59, 7, 100, 0.72);
-  border-top: 1px solid rgba(59, 7, 100, 0.16);
+  color: var(--texto);
+  background: rgba(107, 33, 168, 0.07);
+  border: 1px solid rgba(107, 33, 168, 0.16);
+}
+
+.info-callout strong {
+  color: var(--roxo-escuro);
+  font-family: var(--serif);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.doc-footer {
+  height: 74px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 0 56px;
+  color: rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(90deg, rgba(9, 0, 15, 0.98), rgba(38, 4, 58, 0.98)),
+    url("./assets/textura-fundo-escuro.png");
+  background-size: cover;
+  border-top: 3px solid var(--dourado);
   font-size: 0.74rem;
   font-weight: 800;
+}
+
+.doc-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.doc-footer-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.doc-footer-title {
+  min-width: 0;
+}
+
+.doc-footer-title strong {
+  display: block;
+  color: var(--dourado);
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.doc-footer-title span {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.doc-footer-page {
+  padding-left: 20px;
+  border-left: 1px solid rgba(245, 200, 66, 0.32);
+  color: white;
+  font-family: var(--serif);
+  font-size: 1.2rem;
 }
 
 .measure-zone {

@@ -1,4 +1,4 @@
-const STORAGE_KEY = "feedback_editorial_documento_v7";
+const STORAGE_KEY = "feedback_editorial_documento_v8";
 
 const appState = {
   selectedCategoryIndex: -1,
@@ -29,10 +29,19 @@ const FIELD_MAP = {
   VEREDITO_RESUMIDO: "vereditoResumido",
   STATUS_DO_DOCUMENTO: "statusDocumento",
   DATA: "data",
-  OBSERVACOES_GERAIS: "observacoesGerais"
+  OBSERVACOES_GERAIS: "observacoesGerais",
+  TIPO_DOCUMENTO: "tipoDocumento",
+  NOME_PROJETO: "nomeProjeto",
+  RESPONSAVEL: "responsavel",
+  EMAIL_PROJETO: "emailProjeto",
+  SITE_PROJETO: "siteProjeto",
+  DATA_REVISAO: "dataRevisao",
+  VERSAO_DOCUMENTO: "versaoDocumento",
+  CONFIDENCIALIDADE: "confidencialidade"
 };
 
 const META_INPUTS = {
+  tipoDocumento: "fieldTipoDocumento",
   tituloRelatorio: "fieldTituloRelatorio",
   subtituloRelatorio: "fieldSubtituloRelatorio",
   obra: "fieldObra",
@@ -44,22 +53,71 @@ const META_INPUTS = {
   publicoAlvo: "fieldPublicoAlvo",
   identidadeTonal: "fieldIdentidadeTonal",
   estagioEditorial: "fieldEstagioEditorial",
-  statusDocumento: "fieldStatusDocumento"
+  statusDocumento: "fieldStatusDocumento",
+  nomeProjeto: "fieldNomeProjeto",
+  responsavel: "fieldResponsavel",
+  emailProjeto: "fieldEmailProjeto",
+  siteProjeto: "fieldSiteProjeto",
+  dataRevisao: "fieldDataRevisao",
+  versaoDocumento: "fieldVersaoDocumento",
+  confidencialidade: "fieldConfidencialidade"
 };
+
+const REQUIRED_META = [
+  "OBRA",
+  "GENERO_LITERARIO",
+  "PUBLICO_ALVO",
+  "IDENTIDADE_TONAL",
+  "VEREDITO_RESUMIDO"
+];
 
 const PROMPT_COMPLETO = `Você é um organizador técnico de relatórios editoriais profissionais.
 
 Sua tarefa é pegar o texto de revisão editorial que vou enviar e reorganizá-lo em um padrão fixo, limpo, completo e estruturado para ser usado em uma plataforma geradora de documentos em PDF.
 
-Não faça uma nova revisão. Não resuma. Não suavize críticas. Não invente informações. Apenas organize e padronize.
+REGRAS IMPORTANTES:
+1. Não faça uma nova revisão.
+2. Não resuma.
+3. Não suavize críticas.
+4. Não invente informações.
+5. Não remova conteúdo importante.
+6. Preserve tabelas em Markdown.
+7. Preserve listas.
+8. Preserve exemplos de reescrita.
+9. Preserve o tom técnico editorial.
+10. Entregue apenas o documento padronizado, sem comentários antes ou depois.
 
 Use exatamente este formato:
+
+[TIPO_DOCUMENTO]
+revisao_completa
 
 [TITULO_RELATORIO]
 Relatório de Revisão Editorial
 
 [SUBTITULO_RELATORIO]
 Revisão editorial extremamente detalhada
+
+[NOME_PROJETO]
+Administração do Projeto
+
+[RESPONSAVEL]
+Administração do Projeto
+
+[EMAIL_PROJETO]
+Não informado
+
+[SITE_PROJETO]
+Não informado
+
+[DATA_REVISAO]
+Não informado
+
+[VERSAO_DOCUMENTO]
+Versão 1.0
+
+[CONFIDENCIALIDADE]
+Uso restrito ao autor e à equipe editorial
 
 [OBRA]
 Nome da obra
@@ -134,9 +192,8 @@ Conteúdo completo da categoria.
 
 [FIM_CATEGORIA]
 
-Preserve tabelas em Markdown. Preserve listas. Preserve exemplos e sugestões de reescrita.
-
-Entregue apenas o documento padronizado.
+Categorias recomendadas:
+Diagnóstico Editorial Geral; Premissa e Promessa Narrativa; Estrutura Narrativa; Ritmo; Engenharia de Cenas; Desenvolvimento de Personagens; Relações; Diálogos; Voz Narrativa; Prosa e Estilo; Clareza; Show vs Tell; Subtexto; Construção Emocional; Tensão Narrativa; Consistência Interna; Worldbuilding; Tema e Simbolismo; Originalidade; Gramática e Revisão Técnica; Edição Linha a Linha; Experiência do Leitor; Potencial de Mercado; Sensibilidade e Representação; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Sugestões Concretas de Reescrita; Veredito Editorial Final.
 
 Agora organize o texto abaixo:
 
@@ -146,34 +203,105 @@ const PROMPT_RESUMIDO = `Você é um organizador técnico de relatórios editori
 
 Pegue a revisão editorial que vou enviar e gere uma versão resumida, profissional e estruturada para PDF.
 
-Não invente informações. Não mude o diagnóstico central. Não transforme críticas em elogios. Reduza para cerca de 20% a 35% do original.
+REGRAS:
+1. Não invente informações.
+2. Não mude o diagnóstico central.
+3. Não transforme críticas em elogios.
+4. Reduza para cerca de 20% a 35% do original.
+5. Preserve os pontos realmente importantes.
+6. Entregue apenas o documento padronizado.
 
-Use o mesmo padrão:
+Use exatamente este padrão:
+
+[TIPO_DOCUMENTO]
+revisao_resumida
 
 [TITULO_RELATORIO]
+Relatório de Revisão Editorial
+
 [SUBTITULO_RELATORIO]
+Versão resumida
+
+[NOME_PROJETO]
+Administração do Projeto
+
+[RESPONSAVEL]
+Administração do Projeto
+
+[EMAIL_PROJETO]
+Não informado
+
+[SITE_PROJETO]
+Não informado
+
+[DATA_REVISAO]
+Não informado
+
+[VERSAO_DOCUMENTO]
+Versão 1.0
+
+[CONFIDENCIALIDADE]
+Uso restrito ao autor e à equipe editorial
+
 [OBRA]
+Nome da obra
+
 [AUTOR]
+Nome do autor ou Não informado
+
 [AVALIADOR]
+Nome do avaliador ou Não informado
+
 [TIPO_REVISAO]
+Tipo de revisão
+
 [ESCOPO]
+Escopo do material analisado
+
 [GENERO_LITERARIO]
+Gênero literário aparente
+
 [SUBGENEROS_E_ELEMENTOS]
+Lista de subgêneros e elementos
+
 [PUBLICO_ALVO]
+Público-alvo provável
+
 [IDENTIDADE_TONAL]
+Identidade tonal
+
 [PROMESSA_NARRATIVA]
+Promessa narrativa central
+
 [CONFLITO_CENTRAL]
+Conflito central
+
 [ESTAGIO_EDITORIAL]
+Estágio editorial
+
 [NIVEL_DE_MATURIDADE]
+Nível de maturidade
+
 [MAIOR_FORCA]
+Maior força
+
 [MAIOR_FRAQUEZA]
+Maior fraqueza
+
 [VEREDITO_RESUMIDO]
+Resumo breve do parecer final
+
 [STATUS_DO_DOCUMENTO]
+Status do documento
+
 [DATA]
+Data ou Não informado
+
 [OBSERVACOES_GERAIS]
+Observações gerais
 
 Depois organize nas categorias:
-Diagnóstico Editorial Geral; Gênero, Público e Tom; Premissa e Promessa Narrativa; Estrutura e Ritmo; Personagens e Relações; Prosa, Voz e Diálogos; Mundo, Tema e Originalidade; Gramática e Revisão Técnica; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Sugestões Concretas de Reescrita; Potencial de Mercado; Sensibilidade e Representação; Veredito Editorial Final.
+Diagnóstico Editorial Geral; Gênero, Público e Tom; Premissa e Promessa Narrativa; Estrutura e Ritmo; Personagens e Relações; Prosa, Voz e Diálogos; Mundo, Tema e Originalidade; Gramática e Revisão Técnica; Pontos Fortes; Pontos de Atenção; Prioridades de Reescrita; Plano Prático de Melhoria; Potencial de Mercado; Veredito Editorial Final.
 
 Cada categoria deve seguir:
 
@@ -191,8 +319,6 @@ Conteúdo resumido.
 
 [FIM_CATEGORIA]
 
-Entregue apenas o documento padronizado.
-
 Agora organize o texto abaixo:
 
 COLE AQUI O TEXTO COMPLETO DA REVISÃO EDITORIAL`;
@@ -201,6 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTabs();
   setupButtons();
   loadFromStorage();
+  applyDefaults();
   renderAll();
 });
 
@@ -216,8 +343,11 @@ function setupButtons() {
 
   document.getElementById("loadExampleBtn").addEventListener("click", () => {
     document.getElementById("rawInput").value = getExampleText();
+    runValidation();
     showToast("Exemplo carregado.");
   });
+
+  document.getElementById("validateBtn").addEventListener("click", runValidation);
 
   document.getElementById("parseBtn").addEventListener("click", () => {
     const text = document.getElementById("rawInput").value.trim();
@@ -227,7 +357,16 @@ function setupButtons() {
       return;
     }
 
+    const validation = validateStandardText(text);
+    renderValidation(validation);
+
+    if (validation.errors.length) {
+      showToast("O texto tem erros no padrão. Veja a validação.");
+      return;
+    }
+
     appState.document = parseStandardDocument(text);
+    applyDefaults();
     appState.selectedCategoryIndex = appState.document.categories.length ? 0 : -1;
 
     renderAll();
@@ -238,7 +377,8 @@ function setupButtons() {
   document.getElementById("goEditBtn").addEventListener("click", () => activateTab("editar"));
 
   Object.entries(META_INPUTS).forEach(([key, id]) => {
-    document.getElementById(id).addEventListener("input", (event) => {
+    const input = document.getElementById(id);
+    input.addEventListener("input", (event) => {
       appState.document.meta[key] = event.target.value;
     });
   });
@@ -283,6 +423,14 @@ function setupButtons() {
     showToast("Documento salvo no navegador.");
   });
 
+  document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
+
+  document.getElementById("importJsonBtn").addEventListener("click", () => {
+    document.getElementById("importJsonInput").click();
+  });
+
+  document.getElementById("importJsonInput").addEventListener("change", importJson);
+
   document.getElementById("clearBtn").addEventListener("click", () => {
     if (!window.confirm("Limpar tudo?")) return;
 
@@ -290,7 +438,9 @@ function setupButtons() {
     appState.document = { meta: {}, categories: [] };
     appState.selectedCategoryIndex = -1;
     document.getElementById("rawInput").value = "";
+    document.getElementById("validationBox").classList.add("hidden");
 
+    applyDefaults();
     renderAll();
     showToast("Tudo limpo.");
   });
@@ -318,6 +468,157 @@ function activateTab(tabName) {
     renderPreview();
   }
 }
+
+function applyDefaults() {
+  const meta = appState.document.meta;
+
+  meta.tipoDocumento ||= "revisao_completa";
+  meta.tituloRelatorio ||= getDocTypeConfig(meta.tipoDocumento).title;
+  meta.subtituloRelatorio ||= getDocTypeConfig(meta.tipoDocumento).subtitle;
+  meta.nomeProjeto ||= "Administração do Projeto";
+  meta.responsavel ||= meta.avaliador || "Administração do Projeto";
+  meta.emailProjeto ||= "Não informado";
+  meta.siteProjeto ||= "Não informado";
+  meta.dataRevisao ||= meta.data || "Não informado";
+  meta.versaoDocumento ||= "Versão 1.0";
+  meta.confidencialidade ||= "Uso restrito ao autor e à equipe editorial";
+}
+
+function getDocTypeConfig(type) {
+  const configs = {
+    revisao_completa: {
+      title: "Relatório de Revisão Editorial",
+      subtitle: "Revisão editorial extremamente detalhada",
+      label: "Revisão completa"
+    },
+    revisao_resumida: {
+      title: "Relatório de Revisão Editorial",
+      subtitle: "Versão resumida",
+      label: "Revisão resumida"
+    },
+    parecer_editorial: {
+      title: "Parecer Editorial",
+      subtitle: "Análise técnica e parecer de desenvolvimento literário",
+      label: "Parecer editorial"
+    },
+    ficha_tecnica: {
+      title: "Ficha Técnica Editorial",
+      subtitle: "Mapeamento técnico do manuscrito",
+      label: "Ficha técnica"
+    },
+    leitura_critica: {
+      title: "Relatório de Leitura Crítica",
+      subtitle: "Análise crítica de leitura e desenvolvimento narrativo",
+      label: "Leitura crítica"
+    }
+  };
+
+  return configs[type] || configs.revisao_completa;
+}
+
+/* VALIDATION */
+
+function runValidation() {
+  const text = document.getElementById("rawInput").value.trim();
+
+  if (!text) {
+    showToast("Cole o texto primeiro.");
+    return;
+  }
+
+  const validation = validateStandardText(text);
+  renderValidation(validation);
+
+  if (validation.errors.length) {
+    showToast("Validação concluída com erros.");
+  } else if (validation.warnings.length) {
+    showToast("Validação concluída com avisos.");
+  } else {
+    showToast("Texto validado com sucesso.");
+  }
+}
+
+function validateStandardText(text) {
+  const errors = [];
+  const warnings = [];
+  const normalized = text.replace(/\r\n/g, "\n");
+
+  REQUIRED_META.forEach((marker) => {
+    if (!normalized.includes(`[${marker}]`)) {
+      errors.push(`Campo obrigatório ausente: [${marker}]`);
+    }
+  });
+
+  if (!normalized.includes("[CATEGORIA]")) {
+    errors.push("Nenhuma categoria encontrada. Use pelo menos um bloco [CATEGORIA].");
+  }
+
+  if (normalized.includes("[CATEGORIA]")) {
+    const blocks = normalized.split("[CATEGORIA]").slice(1);
+
+    blocks.forEach((block, index) => {
+      const number = index + 1;
+
+      if (!block.includes("[TIPO_CATEGORIA]")) {
+        errors.push(`Categoria ${number}: faltou [TIPO_CATEGORIA].`);
+      }
+
+      if (!block.includes("[RESUMO_CATEGORIA]")) {
+        warnings.push(`Categoria ${number}: faltou [RESUMO_CATEGORIA].`);
+      }
+
+      if (!block.includes("[CONTEUDO]")) {
+        errors.push(`Categoria ${number}: faltou [CONTEUDO].`);
+      }
+
+      if (!block.includes("[FIM_CATEGORIA]")) {
+        errors.push(`Categoria ${number}: faltou [FIM_CATEGORIA].`);
+      }
+    });
+  }
+
+  if (!normalized.includes("[VEREDITO_RESUMIDO]")) {
+    warnings.push("Campo recomendado ausente: [VEREDITO_RESUMIDO].");
+  }
+
+  if (!normalized.includes("[TIPO_DOCUMENTO]")) {
+    warnings.push("Campo recomendado ausente: [TIPO_DOCUMENTO]. A plataforma usará revisão completa.");
+  }
+
+  return { errors, warnings };
+}
+
+function renderValidation(validation) {
+  const box = document.getElementById("validationBox");
+  box.className = "validation-box";
+
+  if (validation.errors.length) {
+    box.classList.add("error");
+    box.innerHTML = `
+      <h3>Erros encontrados</h3>
+      <ul>${validation.errors.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+      ${validation.warnings.length ? `<h3>Avisos</h3><ul>${validation.warnings.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+    `;
+    return;
+  }
+
+  if (validation.warnings.length) {
+    box.classList.add("warning");
+    box.innerHTML = `
+      <h3>Texto válido, com avisos</h3>
+      <ul>${validation.warnings.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    `;
+    return;
+  }
+
+  box.classList.add("success");
+  box.innerHTML = `
+    <h3>Texto válido</h3>
+    <p>Todos os campos principais foram reconhecidos. O texto pode ser processado.</p>
+  `;
+}
+
+/* PARSE */
 
 function parseStandardDocument(text) {
   const normalized = text.replace(/\r\n/g, "\n");
@@ -385,7 +686,10 @@ function readBetween(text, startMarker, endMarker) {
   return text.slice(start, end);
 }
 
+/* RENDER UI */
+
 function renderAll() {
+  applyDefaults();
   renderMetaInputs();
   renderCategoryList();
   renderCategoryEditor();
@@ -394,7 +698,8 @@ function renderAll() {
 
 function renderMetaInputs() {
   Object.entries(META_INPUTS).forEach(([key, id]) => {
-    document.getElementById(id).value = appState.document.meta[key] || "";
+    const input = document.getElementById(id);
+    input.value = appState.document.meta[key] || "";
   });
 }
 
@@ -477,7 +782,10 @@ function syncAllEditors() {
   });
 
   applyCategoryEditor(false);
+  applyDefaults();
 }
+
+/* PREVIEW */
 
 function renderPreview() {
   const container = document.getElementById("documentPreview");
@@ -512,7 +820,8 @@ function hasContent() {
 }
 
 function renderCover(meta) {
-  const title = splitCoverTitle(meta.tituloRelatorio || "Relatório de Revisão Editorial");
+  const config = getDocTypeConfig(meta.tipoDocumento);
+  const title = splitCoverTitle(meta.tituloRelatorio || config.title);
 
   return `
     <section class="a4-page cover-page">
@@ -521,18 +830,18 @@ function renderCover(meta) {
       <div class="cover-content">
         <div class="cover-top">
           <img class="cover-logo" src="./assets/logo.png" alt="Logo" />
-          <div class="cover-brand">Administração do Projeto</div>
+          <div class="cover-brand">${escapeHtml(meta.nomeProjeto || "Administração do Projeto")}</div>
         </div>
 
         <div class="cover-main">
-          <div class="cover-kicker">${escapeHtml(meta.tipoRevisao || "Revisão Editorial Profissional")}</div>
+          <div class="cover-kicker">${escapeHtml(config.label)}</div>
 
           <h1 class="cover-title">
             ${escapeHtml(title.first)}
             ${title.second ? `<br><strong>${escapeHtml(title.second)}</strong>` : ""}
           </h1>
 
-          <p class="cover-subtitle">${escapeHtml(meta.subtituloRelatorio || "Documento técnico de análise editorial, estrutura narrativa e aprimoramento literário.")}</p>
+          <p class="cover-subtitle">${escapeHtml(meta.subtituloRelatorio || config.subtitle)}</p>
 
           <div class="cover-work">
             <span>Obra analisada</span>
@@ -544,6 +853,8 @@ function renderCover(meta) {
           ${coverMeta("Autor", meta.autor)}
           ${coverMeta("Avaliador", meta.avaliador)}
           ${coverMeta("Escopo", meta.escopo)}
+          ${coverMeta("Versão", meta.versaoDocumento)}
+          ${coverMeta("Data", meta.dataRevisao)}
           ${coverMeta("Status", meta.statusDocumento)}
         </div>
       </div>
@@ -583,6 +894,14 @@ function coverMeta(label, value) {
 
 function renderFicha(meta, pageNumber) {
   const rows = [
+    ["Tipo de documento", getDocTypeConfig(meta.tipoDocumento).label],
+    ["Projeto", meta.nomeProjeto],
+    ["Responsável", meta.responsavel],
+    ["E-mail", meta.emailProjeto],
+    ["Site", meta.siteProjeto],
+    ["Data da revisão", meta.dataRevisao],
+    ["Versão", meta.versaoDocumento],
+    ["Confidencialidade", meta.confidencialidade],
     ["Gênero literário", meta.generoLiterario],
     ["Subgêneros e elementos", meta.subgenerosElementos],
     ["Público-alvo", meta.publicoAlvo],
@@ -593,8 +912,7 @@ function renderFicha(meta, pageNumber) {
     ["Nível de maturidade", meta.nivelMaturidade],
     ["Maior força", meta.maiorForca],
     ["Maior fraqueza", meta.maiorFraqueza],
-    ["Status", meta.statusDocumento],
-    ["Data", meta.data]
+    ["Status", meta.statusDocumento]
   ].filter(([, value]) => String(value || "").trim());
 
   const scopeItems = [
@@ -652,13 +970,16 @@ function renderFicha(meta, pageNumber) {
         </div>
       </main>
 
-      ${renderFooter(pageNumber)}
+      ${renderFooter(meta)}
     </section>
   `;
 }
 
+/* PAGINATION */
+
 function paginateCategory(category, startPageNumber, categoryIndex) {
-  const blocks = markdownToBlocks(category.content || "");
+  const rawBlocks = markdownToBlocks(category.content || "");
+  const blocks = groupBlocksForPagination(rawBlocks);
   const pages = [];
   let current = [];
   let pageNumber = startPageNumber;
@@ -689,6 +1010,27 @@ function paginateCategory(category, startPageNumber, categoryIndex) {
     ),
     count: total
   };
+}
+
+function groupBlocksForPagination(blocks) {
+  const grouped = [];
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const next = blocks[i + 1] || "";
+
+    const isHeading = /^<h[1-3]/.test(block);
+    const nextExists = Boolean(next);
+
+    if (isHeading && nextExists) {
+      grouped.push(block + next);
+      i++;
+    } else {
+      grouped.push(block);
+    }
+  }
+
+  return grouped;
 }
 
 function fitsPage(category, categoryIndex, htmlContent) {
@@ -757,7 +1099,7 @@ function renderCategoryPage(category, categoryIndex, pageNumber, htmlContent, pa
         </div>
       </main>
 
-      ${renderFooter(pageNumber)}
+      ${renderFooter(appState.document.meta)}
     </section>
   `;
 }
@@ -808,7 +1150,7 @@ function renderFinalPage(category, categoryIndex, pageNumber, htmlContent) {
               </div>
 
               <div class="signature">
-                <div class="signature-name">Administração do Projeto</div>
+                <div class="signature-name">${escapeHtml(appState.document.meta.nomeProjeto || "Administração do Projeto")}</div>
                 <div class="signature-role">Grupo de gestão e estratégia</div>
               </div>
             </div>
@@ -816,7 +1158,7 @@ function renderFinalPage(category, categoryIndex, pageNumber, htmlContent) {
         </div>
       </main>
 
-      ${renderFooter(pageNumber)}
+      ${renderFooter(appState.document.meta)}
     </section>
   `;
 }
@@ -836,14 +1178,16 @@ function renderHeader(meta, label, pageNumber) {
   `;
 }
 
-function renderFooter(pageNumber) {
+function renderFooter(meta) {
   return `
     <footer class="doc-footer">
-      <strong>Administração do Projeto</strong>
-      <span>Relatório Editorial Profissional</span>
+      <strong>${escapeHtml(meta.nomeProjeto || "Administração do Projeto")}</strong>
+      <span>${escapeHtml(meta.confidencialidade || "Relatório Editorial Profissional")}</span>
     </footer>
   `;
 }
+
+/* LABELS */
 
 function getCategoryLabel(type = "") {
   const map = {
@@ -886,6 +1230,72 @@ function getObservationText(type = "") {
   };
 
   return map[(type || "").toLowerCase()] || "";
+}
+
+/* JSON */
+
+function exportJson() {
+  syncAllEditors();
+
+  const data = {
+    exportedAt: new Date().toISOString(),
+    app: "feedback-editorial",
+    version: "1.0",
+    document: appState.document
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const filename = createJsonFileName(appState.document.meta.obra || "documento");
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+
+  URL.revokeObjectURL(url);
+  showToast("Dados exportados em JSON.");
+}
+
+function importJson(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const documentData = parsed.document || parsed;
+
+      if (!documentData.meta || !Array.isArray(documentData.categories)) {
+        throw new Error("Formato inválido.");
+      }
+
+      appState.document = documentData;
+      applyDefaults();
+      appState.selectedCategoryIndex = appState.document.categories.length ? 0 : -1;
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState.document));
+
+      renderAll();
+      activateTab("editar");
+      showToast("Projeto importado com sucesso.");
+    } catch (error) {
+      console.error(error);
+      showToast("Arquivo JSON inválido.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function createJsonFileName(name) {
+  const slug = slugify(name);
+  return `projeto-editorial-${slug || "documento"}.json`;
 }
 
 /* PDF */
@@ -937,7 +1347,7 @@ async function generatePdf() {
   } finally {
     status.classList.add("hidden");
     button.disabled = false;
-    button.textContent = "Gerar PDF";
+    button.textContent = "Gerar PDF visual";
   }
 }
 
@@ -957,14 +1367,16 @@ function waitForAllImages(root) {
 }
 
 function createPdfFileName(name) {
-  const slug = String(name)
+  return `revisao-editorial-${slugify(name) || "documento"}.pdf`;
+}
+
+function slugify(value) {
+  return String(value || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-
-  return `revisao-editorial-${slug || "documento"}.pdf`;
 }
 
 /* MARKDOWN */
@@ -1170,11 +1582,35 @@ function showToast(message) {
 /* EXEMPLO */
 
 function getExampleText() {
-  return `[TITULO_RELATORIO]
+  return `[TIPO_DOCUMENTO]
+revisao_completa
+
+[TITULO_RELATORIO]
 Relatório de Revisão Editorial
 
 [SUBTITULO_RELATORIO]
 Revisão editorial extremamente detalhada
+
+[NOME_PROJETO]
+Administração do Projeto
+
+[RESPONSAVEL]
+Administração do Projeto
+
+[EMAIL_PROJETO]
+contato@administracaodoprojeto.com.br
+
+[SITE_PROJETO]
+administracaodoprojeto.com.br
+
+[DATA_REVISAO]
+Não informado
+
+[VERSAO_DOCUMENTO]
+Versão 1.0
+
+[CONFIDENCIALIDADE]
+Uso restrito ao autor e à equipe editorial
 
 [OBRA]
 O Amado da Luzz
